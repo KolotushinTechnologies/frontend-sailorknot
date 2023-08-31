@@ -4,6 +4,7 @@ import { RegisterRequest } from "@/src/shared/http/services/authService/types/re
 import { DocumentItem, DocumentProps } from "@/src/shared/types/document"
 import SelectImages from "@/src/widgets/SelectImages"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import React, { FC, useState } from "react"
 import { useForm } from "react-hook-form"
 
@@ -13,6 +14,7 @@ interface FormProps extends RegisterRequest {
 }
 
 const SignUpPage: FC<ComponentProps> = () => {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -20,8 +22,10 @@ const SignUpPage: FC<ComponentProps> = () => {
   } = useForm<FormProps>()
   const onSubmit = handleSubmit(async (data) => {
     if (data.password !== data.confirmPassword) return alert("Пароли должны совпадать")
+    if (!selectedSpecial) return alert("Выбирете должность")
     try {
-      const { data: res } = await AuthService.register(data)
+      const { data: res } = await AuthService.register({...data, speciality: selectedSpecial.title})
+      router.push('/profile')
       alert("Успех")
     } catch (error) {
       alert("Ошибка")
