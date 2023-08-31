@@ -1,8 +1,10 @@
+import { documents } from "@/src/shared/documents"
 import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
+import { DocumentItem, DocumentProps } from "@/src/shared/types/document"
 import SelectImages from "@/src/widgets/SelectImages"
 import Link from "next/link"
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import { useForm } from "react-hook-form"
 
 interface ComponentProps {}
@@ -26,6 +28,14 @@ const SignUpPage: FC<ComponentProps> = () => {
       console.log(error)
     }
   })
+
+  const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
+  const onSelectSpecial = (item: string) => {
+    const matchItem = documents.find((filteredItem) => filteredItem.title === item)
+    if (matchItem) {
+      selectedSpecialSet(matchItem)
+    }
+  }
 
   return (
     <div className="my-auto flex min-h-[calc(100vh-134px)] items-center justify-center px-4 py-4 sm:px-12">
@@ -71,15 +81,6 @@ const SignUpPage: FC<ComponentProps> = () => {
               {...register("dateBirth", { required: true })}
               type="text"
               placeholder="Дата рождения"
-              className="form-input"
-            />
-          </div>
-
-          <div className="mb-4">
-            <input
-              {...register("speciality", { required: true })}
-              type="text"
-              placeholder="Должность"
               className="form-input"
             />
           </div>
@@ -148,24 +149,33 @@ const SignUpPage: FC<ComponentProps> = () => {
               className="form-input"
             />
           </div>
-          <div className="mb-7 flex items-center gap-3 p-1.5">
-            <input
-              id="teams"
-              type="checkbox"
-              className="h-[18px] w-[18px] rounded border-black/20 bg-white text-black focus:outline-0 focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 dark:border-white/20 dark:bg-white/5"
-            />
+
+          <div className="mb-4">
             <label
-              htmlFor="teams"
-              className="text-black/40 dark:text-white/40">
-              Я принимаю{" "}
-              <Link
-                href="/"
-                className="text-lightpurple-300">
-                политику конфиденциальности
-              </Link>
+              htmlFor="countries"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Должность <span>{selectedSpecial?.title}</span>
             </label>
+            <select
+              defaultValue={''}
+              onChange={(e) => onSelectSpecial(e.target.value)}
+              id="countries"
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+              <option>Выбирете должность</option>
+              {documents.map((item) => {
+                const { title, documents } = item
+                return (
+                  <option
+                    key={item.title}
+                    value={`${title}`}>
+                    {title}
+                  </option>
+                )
+              })}
+            </select>
           </div>
-          <SelectImages />
+
+          <SelectImages selectedSpecial={selectedSpecial} />
           <button
             type="submit"
             className="w-full rounded-lg border border-black bg-black px-4 py-2 text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
