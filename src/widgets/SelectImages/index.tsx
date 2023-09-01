@@ -6,6 +6,12 @@ interface ComponentProps {
   selectedSpecial: DocumentProps | null
 }
 
+/**
+ * 
+ * @param param0 
+ * @returns 
+ */
+
 const SelectImages = ({ selectedSpecial }: ComponentProps) => {
   const [images, setImages] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)

@@ -3,6 +3,7 @@ import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
 import { DocumentItem, DocumentProps } from "@/src/shared/types/document"
 import SelectImages from "@/src/widgets/SelectImages"
+import SelectMultipleImages from "@/src/widgets/SelectImages/selectMultipleImages"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import React, { FC, useState } from "react"
@@ -24,8 +25,8 @@ const SignUpPage: FC<ComponentProps> = () => {
     if (data.password !== data.confirmPassword) return alert("Пароли должны совпадать")
     if (!selectedSpecial) return alert("Выбирете должность")
     try {
-      const { data: res } = await AuthService.register({...data, speciality: selectedSpecial.title})
-      router.push('/profile')
+      const { data: res } = await AuthService.register({ ...data, speciality: selectedSpecial.title })
+      router.push("/profile")
       alert("Успех")
     } catch (error) {
       alert("Ошибка")
@@ -161,7 +162,7 @@ const SignUpPage: FC<ComponentProps> = () => {
               Должность <span>{selectedSpecial?.title}</span>
             </label>
             <select
-              defaultValue={''}
+              defaultValue={""}
               onChange={(e) => onSelectSpecial(e.target.value)}
               id="countries"
               className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
@@ -178,8 +179,7 @@ const SignUpPage: FC<ComponentProps> = () => {
               })}
             </select>
           </div>
-
-          <SelectImages selectedSpecial={selectedSpecial} />
+          <SelectMultipleImages selectedSpecial={selectedSpecial} />
           <button
             type="submit"
             className="w-full rounded-lg border border-black bg-black px-4 py-2 text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
