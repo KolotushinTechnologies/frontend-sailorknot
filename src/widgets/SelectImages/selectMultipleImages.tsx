@@ -1,3 +1,4 @@
+import { checkIsImage } from "@/src/shared/helpers/checkIsImage"
 import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
 import { log } from "console"
@@ -14,7 +15,6 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
 
   const handleFileInputChange = (index: number, name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    console.log("clicked")
 
     if (files) {
       const updatedSelectedImages = {
@@ -42,6 +42,7 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
     return (
       <div className="my-2">
         <input
+          accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,.txt,image/jpeg,image/png"
           type="file"
           style={{ display: "none" }}
           ref={(el) => (fileInputRefs.current[index] = el)}
@@ -85,31 +86,39 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
           "pointer-events-auto block opacity-100": selectedSpecial,
         })}>
         {selectedSpecial && (
-          <div>
+          <div className="space-y-2">
             <h3 className="mb-4 text-[16px] font-medium">Всего файлов для загрузки: {maxLength} </h3>
             {selectedSpecial.documents.map((doc, index) => {
-              const matchImage = selectedImages.find((img) => img.name === doc.name)
+              const matchFile = selectedImages.find((img) => img.name === doc.name)
+
               let link = ""
-              if (matchImage) {
-                link = window.URL.createObjectURL(matchImage.file)
+              let isImage = false
+              if (matchFile) {
+                link = window.URL.createObjectURL(matchFile.file)
+                isImage = checkIsImage(matchFile.file)
               }
+
               if (!doc.additionDocuments) {
                 return (
                   <div
                     key={index}
                     className="space-y-4">
                     <ul>
-                      <li>
+                      <li className="rounded-md bg-gray-200 p-2">
                         <p>
                           {index + 1}. {doc.name}
                         </p>
-
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
-                        {link.length === 0 ? null : (
+                        {isImage === false && matchFile ? (
+                          <div className="flex h-40 w-full items-center justify-center rounded-md bg-gray-100">{matchFile.file.name}</div>
+                        ) : isImage === true && matchFile ? (
                           <PhotoView src={link}>
-                            <img src={link} />
+                            <img
+                              className="h-40 w-full rounded-md"
+                              src={link}
+                            />
                           </PhotoView>
-                        )}
+                        ) : null}
                       </li>
                     </ul>
                   </div>
@@ -119,13 +128,18 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
                   <div
                     key={index}
                     className="mb-2 mt-4 rounded-md bg-gray-200 p-4 pl-4">
+                    {/* Общий заголовок */}
                     <p className="mb-2 text-[16px] font-medium">{doc.name}</p>
+
                     <ul className="list-inside space-y-2">
                       {doc.additionDocuments.map((addDoc, addIndex) => {
-                        const matchImage = selectedImages.find((img) => img.name === addDoc)
+                        const matchFile = selectedImages.find((img) => img.name === addDoc)
+
                         let link = ""
-                        if (matchImage) {
-                          link = window.URL.createObjectURL(matchImage.file)
+                        let isImage = false
+                        if (matchFile) {
+                          link = window.URL.createObjectURL(matchFile.file)
+                          isImage = checkIsImage(matchFile.file)
                         }
                         return (
                           <li key={addIndex}>
@@ -133,11 +147,16 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
                               {index + 1}.{addIndex + 1} {addDoc}
                             </p>
                             {renderFileInput(index + addIndex, addDoc)}
-                            {link.length === 0 ? null : (
+                            {isImage === false && matchFile ? (
+                              <div className="flex h-40 w-full items-center justify-center rounded-md bg-gray-100">{matchFile.file.name}</div>
+                            ) : isImage === true && matchFile ? (
                               <PhotoView src={link}>
-                                <img src={link} />
+                                <img
+                                  className="h-40 w-full rounded-md"
+                                  src={link}
+                                />
                               </PhotoView>
-                            )}
+                            ) : null}
                           </li>
                         )
                       })}
