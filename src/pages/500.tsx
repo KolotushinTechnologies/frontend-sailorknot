@@ -1,11 +1,8 @@
-import { ReactElement } from "react"
-import { NextPageWithLayout } from "./_app"
-import { SiteLayout } from "../widgets/Layouts/SiteLayout"
 import Link from "next/link"
 
 interface PageProps {}
 
-const Page: NextPageWithLayout<PageProps> = () => {
+const Page = () => {
   return (
     <>
       <div className="flex min-h-[calc(100vh-134px)] items-center justify-center px-4 py-4 sm:px-12">
@@ -30,10 +27,6 @@ const Page: NextPageWithLayout<PageProps> = () => {
       </div>
     </>
   )
-}
-
-Page.getLayout = function getLayout(page: ReactElement) {
-  return <SiteLayout>{page}</SiteLayout>
 }
 
 export default Page

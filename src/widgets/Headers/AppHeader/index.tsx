@@ -10,8 +10,8 @@ interface ComponentProps {
 
 const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
   const toggleSidebar = () => handler()
-  const router = useRouter();
-  
+  const router = useRouter()
+
   return (
     <>
       <div
@@ -124,7 +124,6 @@ const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
                 id="voice-search"
                 className="block w-full max-w-[160px] rounded-lg border-0 bg-black/5 p-1 px-[26px] text-sm text-black focus:outline-0 focus:ring-0 dark:bg-white/10 dark:text-white/40"
                 placeholder="Поиск..."
-                
               />
               <button
                 type="button"
@@ -212,7 +211,8 @@ const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
                 </svg>
               </Link>
             </div>
-            <button
+            <Link
+              href="/profile/notifications"
               type="button"
               className="relative h-7 w-7 p-1 text-black dark:text-white">
               <svg
@@ -234,11 +234,8 @@ const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
                   d="M13.125 15.625V15C13.125 14.6548 12.8452 14.375 12.5 14.375C12.1548 14.375 11.875 14.6548 11.875 15V15.625C11.875 16.4016 11.3258 16.9508 11.3258 16.9508C10.7766 17.5 10 17.5 10 17.5C9.22335 17.5 8.67417 16.9508 8.67417 16.9508C8.125 16.4016 8.125 15.625 8.125 15.625V15C8.125 14.6548 7.84518 14.375 7.5 14.375C7.15482 14.375 6.875 14.6548 6.875 15L6.875 15.625C6.875 16.9194 7.79029 17.8347 7.79029 17.8347C8.70558 18.75 10 18.75 10 18.75C11.2944 18.75 12.2097 17.8347 12.2097 17.8347C13.125 16.9194 13.125 15.625 13.125 15.625Z"
                   fill="currentColor"></path>
               </svg>
-              <span className="absolute right-px top-[5px] flex h-3 w-3">
-                <span className="absolute -left-[3px] -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-black/50 opacity-75 dark:bg-white/50"></span>
-                <span className="relative inline-flex h-[6px] w-[6px] rounded-full bg-black dark:bg-white"></span>
-              </span>
-            </button>
+              <span className="absolute right-[-8px] top-[-12px] inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-500 text-center text-[11px] text-white">10</span>
+            </Link>
             <div className="profile">
               <Link
                 href="/profile"
