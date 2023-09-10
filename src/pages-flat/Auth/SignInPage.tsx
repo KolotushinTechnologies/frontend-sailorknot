@@ -1,3 +1,4 @@
+import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { AuthService } from "@/src/shared/http/services/authService"
 import { LoginRequest } from "@/src/shared/http/services/authService/types/login"
 import Link from "next/link"
@@ -15,7 +16,7 @@ const SignInPage: FC<ComponentProps> = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const { data: res } = await AuthService.login(data)
-      alert("Успех")
+      localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
     } catch (error) {
       alert("Ошибка")
       console.log(error)

@@ -9,7 +9,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
   return (
     <div>
       <h1 className="mb-6 text-lg font-bold">Заявки</h1>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 10 }).map((_item, indx) => {
           return (
             <div

@@ -1,16 +1,27 @@
 import { checkIsImage } from "@/src/shared/helpers/checkIsImage"
 import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
-import { log } from "console"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef } from "react"
 import { PhotoProvider, PhotoView } from "react-photo-view"
 interface ComponentProps {
+  selectedImages: {
+    file: File
+    name: string
+  }[]
+  setSelectedImages: React.Dispatch<
+    React.SetStateAction<
+      {
+        file: File
+        name: string
+      }[]
+    >
+  >
   selectedSpecial: DocumentProps | null
+  selectedSpecialCount: number
+  selectedSpecialCountSet: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
-  const [maxLength, maxLengthSet] = useState(0)
-  const [selectedImages, setSelectedImages] = useState<{ file: File; name: string }[]>([])
+const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   const handleFileInputChange = (index: number, name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,11 +79,11 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
   useEffect(() => {
     setSelectedImages([])
     if (selectedSpecial) {
-      let maxLength = selectedSpecial.documents.length - 1
-      maxLengthSet(maxLength)
+      let selectedSpecialCount = selectedSpecial.documents.length - 1
+      selectedSpecialCountSet(selectedSpecialCount)
       for (const document of selectedSpecial.documents) {
         if (document.additionDocuments) {
-          maxLengthSet((prev) => prev + document.additionDocuments!.length)
+          selectedSpecialCountSet((prev) => prev + document.additionDocuments!.length)
         }
       }
     }
@@ -81,13 +92,13 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
   return (
     <PhotoProvider>
       <div
-        className={clsx("mb-6 rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all", {
+        className={clsx("mb-6 selection:bg-transparent rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all", {
           "pointer-events-none hidden cursor-not-allowed opacity-10": !selectedSpecial,
           "pointer-events-auto block opacity-100": selectedSpecial,
         })}>
         {selectedSpecial && (
           <div className="space-y-2">
-            <h3 className="mb-4 text-[16px] font-medium">Всего файлов для загрузки: {maxLength} </h3>
+            <h3 className="mb-4 text-[16px] font-medium">Всего файлов для загрузки: {selectedSpecialCount} </h3>
             {selectedSpecial.documents.map((doc, index) => {
               const matchFile = selectedImages.find((img) => img.name === doc.name)
 
@@ -114,7 +125,7 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
                         ) : isImage === true && matchFile ? (
                           <PhotoView src={link}>
                             <img
-                              className="h-40 w-full rounded-md"
+                              className="h-40 w-full rounded-md object-cover"
                               src={link}
                             />
                           </PhotoView>
@@ -152,7 +163,7 @@ const SelectMultipleImages = ({ selectedSpecial }: ComponentProps) => {
                             ) : isImage === true && matchFile ? (
                               <PhotoView src={link}>
                                 <img
-                                  className="h-40 w-full rounded-md"
+                                  className="h-40 w-full rounded-md object-cover"
                                   src={link}
                                 />
                               </PhotoView>
