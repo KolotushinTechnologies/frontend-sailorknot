@@ -1,5 +1,6 @@
+import { User } from "@/src/shared/http/services/userService/types/getAll"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
-import { User } from "@/src/shared/types/user"
+
 import Link from "next/link"
 import { ChangeEvent, FC, useState } from "react"
 
@@ -39,7 +40,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
                 <input
                   type="text"
                   placeholder="Имя"
-                  defaultValue={item ? item.name : ""}
+                  defaultValue={item ? item.email : ""}
                   className="form-input"
                 />
               </div>
@@ -48,7 +49,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
                 <input
                   type="text"
                   placeholder="Username"
-                  defaultValue={item ? item.username : ""}
+                  defaultValue={item ? item.email : ""}
                   className="form-input"
                 />
               </div>

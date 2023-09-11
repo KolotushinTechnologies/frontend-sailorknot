@@ -2,12 +2,16 @@ import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { AuthService } from "@/src/shared/http/services/authService"
 import { LoginRequest } from "@/src/shared/http/services/authService/types/login"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import React, { FC } from "react"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface ComponentProps {}
 
 const SignInPage: FC<ComponentProps> = () => {
+  const router = useRouter()
+
   const {
     register,
     handleSubmit,
@@ -17,8 +21,10 @@ const SignInPage: FC<ComponentProps> = () => {
     try {
       const { data: res } = await AuthService.login(data)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
+      router.push("/profile/settings")
+      toast.success(`Успех`)
     } catch (error) {
-      alert("Ошибка")
+      toast.error("Ошибка")
       console.log(error)
     }
   })

@@ -8,16 +8,16 @@ import { GetAllResponse, User } from "@/src/shared/http/services/userService/typ
 import clsx from "clsx"
 import AdminPagination from "../../Pagination/AdminPagination"
 import { UserService } from "@/src/shared/http/services/userService"
-
+import toast from "react-hot-toast"
 
 interface ComponentProps {
-  users: GetAllResponse
+  items: GetAllResponse
   page: number
   take: number
   orderBy: string
 }
 
-export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
+export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
   const [animationParent] = useAutoAnimate()
   const router = useRouter()
   const headerTable = ["Email", "Роли", "Активирован", "Действия"]
@@ -37,7 +37,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
   const onSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     if (isChecked) {
-      selectedItemsSet(users.users)
+      selectedItemsSet(items.users)
     } else {
       selectedItemsSet([])
     }
@@ -56,13 +56,14 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
     ModalStore.update((store) => {
       store.modalStoreTitle = `Удалить  ${selectedItems.length} шт.?`
       store.modalStoreConfirm = async () => {
-        try {
-          const deleteUsers = await Promise.allSettled(selectedItems.map(({ id }) => UserService.deleteOne(id)))
-          selectedItemsSet([])
-          console.log('deleteUsers: ', deleteUsers);
-          
-          router.push(router.asPath)
-        } catch (error) {}
+        toast.success("Удалено")
+        // try {
+        //   const deleteUsers = await Promise.allSettled(selectedItems.map(({ id }) => UserService.deleteOne(id)))
+        //   selectedItemsSet([])
+        //   console.log('deleteUsers: ', deleteUsers);
+
+        //   router.push(router.asPath)
+        // } catch (error) {}
       }
       store.modalStoreCancel = async () => console.log("Удалить нет")
     })
@@ -93,7 +94,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
     <>
       <AdminPagination
         currentPage={page}
-        meta={users.meta}
+        meta={items.meta}
       />
       <div
         ref={animationParent}
@@ -159,7 +160,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
                       id="checkbox-all-search"
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                      checked={selectedItems.length === users.users.length}
+                      checked={selectedItems.length === items.users.length}
                       onChange={onSelectAll}
                     />
                     <label
@@ -182,7 +183,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
               </tr>
             </thead>
             <tbody>
-              {users.users.map((item, indx) => {
+              {items.users.map((item, indx) => {
                 return (
                   <tr
                     key={indx}
@@ -253,7 +254,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ users, page }) => {
       </div>
       <AdminPagination
         currentPage={page}
-        meta={users.meta}
+        meta={items.meta}
       />
     </>
   )

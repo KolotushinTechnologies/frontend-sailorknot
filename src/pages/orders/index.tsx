@@ -1,16 +1,16 @@
 import { ReactElement } from "react"
 import { NextPageWithLayout } from "../_app"
-import { DashboardMain } from "@/src/widgets/Dashboard/DashboardMain"
-import DashboardLayout from "@/src/widgets/Layouts/DashboardLayout"
+import { SiteLayout } from "../../widgets/Layouts/SiteLayout"
+import OrdersPage from "@/src/pages-flat/OrdersPage"
 
 interface PageProps {}
 
 const Page: NextPageWithLayout<PageProps> = () => {
-  return <DashboardMain />
+  return <OrdersPage />
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>
+  return <SiteLayout>{page}</SiteLayout>
 }
 
 export default Page

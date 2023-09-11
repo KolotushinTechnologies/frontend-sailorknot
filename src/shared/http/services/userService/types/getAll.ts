@@ -3,6 +3,13 @@ export interface GetAllResponse {
   users: User[]
 }
 
+interface Meta {
+  page: number
+  total: number
+  pageSize: number
+  pageCount: number
+}
+
 export interface User {
   id: string
   email: string
@@ -13,11 +20,4 @@ export interface User {
 interface Role {
   id: number
   name: string
-}
-
-interface Meta {
-  page: number
-  total: number
-  pageSize: number
-  pageCount: number
 }

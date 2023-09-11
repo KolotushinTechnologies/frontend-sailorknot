@@ -12,7 +12,6 @@ const useGetUser = () => {
       const {data} = await AuthService.getUser()
       profileStoreGetUser(data)
     } catch (error) {
-      router.push("/")
       toast.error("Выполните вход")
     }
   }

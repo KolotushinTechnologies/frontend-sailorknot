@@ -1,16 +1,15 @@
-import { http } from "../.."
 import { GetAllResponse } from "./types/getAll"
+import allUsers from "@/shared/constants/demo-users.json"
+import { GetOneResponse } from "./types/getOneById"
+const allUsersParse = allUsers as GetAllResponse
 
 export class UserService {
-  static async getAll({ page = 1, take = 10, orderBy = "createdAt_asc" }: { page?: number; take?: number; orderBy?: string }) {
-    return await http.post<GetAllResponse>("api/users/query", {
-      page,
-      take,
-      orderBy,
-    })
+  static getAll() {
+    return allUsersParse as GetAllResponse
   }
 
-  static async deleteOne(userId: string) {
-    return await http.delete<{ userId: string }>(`api/users/${userId}`)
+  static getOneById(userId: string) {
+    const user = allUsersParse.users.find(user=>user.id === userId)
+    return user as GetOneResponse
   }
 }

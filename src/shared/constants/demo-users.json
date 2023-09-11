@@ -1,0 +1,436 @@
+{
+  "meta": {
+    "page": 1,
+    "total": 29,
+    "pageSize": 30,
+    "pageCount": 1
+  },
+  "users": [
+    {
+      "id": "3c0be0fb-5758-45ba-b83f-d57a38de9277",
+      "email": "Thurman_Fadel90@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "3d229bf1-9fcf-48f7-a550-dcbfa11c2be2",
+      "email": "Curtis.Daniel@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "67fa048d-e777-4834-aed8-0adb01c931c2",
+      "email": "Xavier19@yahoo.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "04f24d28-828b-4943-ae92-084bbf50e767",
+      "email": "Winfield.Bechtelar@hotmail.com",
+      "isActivated": true,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "0a5c12bc-8fad-41e3-bade-ff5e8b1c5739",
+      "email": "Freda_Beier@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "e5ff2e6f-8fd7-4501-8d61-d3fb5b69951b",
+      "email": "Gerda.Rice@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "0eea5851-60d3-41d2-9d83-dfe97215fa58",
+      "email": "Adelia36@mail.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "0c90e2d4-f663-4220-9246-9f04f37f2c08",
+      "email": "Percival1@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "b0fc4692-6265-476d-b4d7-b4e43cd0e9a3",
+      "email": "Maddison50@mail.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "de3334bb-bfcf-4dd6-a8d8-94a0095364cb",
+      "email": "Eriberto.Schmitt@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "ec5c9e65-2c44-4bcf-b772-28c300ec1951",
+      "email": "Edgar_Goodwin96@mail.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "43b5bc8a-455d-4cb9-a61d-353cc1b2a59a",
+      "email": "Krystina76@hotmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "464a1113-0b78-4f28-884c-a1262bb9a316",
+      "email": "Jerome65@mail.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "03ba3a52-5c24-4590-b5e4-7c64f03e810b",
+      "email": "Dina45@yandex.ru",
+      "isActivated": true,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        },
+        {
+          "id": 3,
+          "name": "ADMIN"
+        }
+      ]
+    },
+    {
+      "id": "171c1328-1a78-4a58-9798-8803eb64e0dc",
+      "email": "Cora.Batz@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "32dfb6a7-c2cc-42c3-a2d3-7f1c47d1acfb",
+      "email": "Bridie5@yahoo.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "736d9b4d-dbe5-40e7-914d-e217b7d5152f",
+      "email": "Kale_Rodriguez@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "c107a72e-cbc6-49ba-9c06-c0c3c7657cf4",
+      "email": "Vanessa_Dickens7@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "71022c2a-925f-4062-83d6-49776430f103",
+      "email": "Tatyana_Stamm@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "29a71c3f-e855-4757-a573-53e041267f0d",
+      "email": "Marlen.Gusikowski@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "692bcfd3-b44a-4485-bf2b-2fdaf1b708e3",
+      "email": "Burnice_Abbott99@yahoo.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "3341f272-2dc8-4103-b899-9282e8d1d019",
+      "email": "Durward49@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "f7b63f1e-ce35-4542-a80a-cb6650af7b44",
+      "email": "Durward30@hotmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "212f301e-8cd6-43bf-8445-da2dcfbd7675",
+      "email": "Felton.Zboncak92@gmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "cf533023-7261-49be-aa2b-c54bf6d16615",
+      "email": "Ilene_Kassulke40@yandex.ru",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "0643207d-d95e-427e-b33b-2791dd72e570",
+      "email": "Lizeth.West25@hotmail.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "86863b46-8334-4452-9fd6-f33ca76c0c07",
+      "email": "Robbie.Rutherford26@yahoo.com",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        },
+        {
+          "id": 2,
+          "name": "MANAGER"
+        }
+      ]
+    },
+    {
+      "id": "d8a1e75e-faf5-49ec-99c5-e0d43e192ec7",
+      "email": "string",
+      "isActivated": false,
+      "roles": [
+        {
+          "id": 1,
+          "name": "USER"
+        }
+      ]
+    },
+    {
+      "id": "097d0a22-e6af-4ab5-93f3-d84c819c126d",
+      "email": "qwerty@gmail.com",
+      "isActivated": false,
+      "roles": []
+    }
+  ]
+}
