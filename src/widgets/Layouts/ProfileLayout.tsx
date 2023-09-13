@@ -1,10 +1,3 @@
-// const DashboardLayout = ({ children }: any) => {
-//   return { children }
-// }
-
-// export { DashboardLayout }
-
-
 import AppHeader from "@/src/widgets/Headers/AppHeader"
 import AppSidebar from "@/src/widgets/AppSidebar"
 import ProfileHeader from "@/src/widgets/ProfileHeader"

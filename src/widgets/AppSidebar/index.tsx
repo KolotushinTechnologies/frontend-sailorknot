@@ -28,7 +28,8 @@ const AppSidebar: FC<ComponentProps> = ({ isSideBarActive, handler, isSmall }) =
           <Link
             href="/"
             className="main-logo w-full flex-1">
-            <img
+            {/* TODO: Add icon */}
+            {/* <img
               src="https://webonzer.com/snow/assets/images/logo.svg"
               alt="logo"
               className="block dark:hidden"
@@ -37,7 +38,8 @@ const AppSidebar: FC<ComponentProps> = ({ isSideBarActive, handler, isSmall }) =
               src="https://webonzer.com/snow/assets/images/logo.svg"
               alt="logo"
               className="hidden dark:block"
-            />
+            /> */}
+            <span className="rounded-xl bg-blue-100 px-4 py-1 font-bold uppercase">Sailorknot</span>
           </Link>
         </div>
       </div>

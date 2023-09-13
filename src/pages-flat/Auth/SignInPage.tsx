@@ -43,6 +43,7 @@ const SignInPage: FC<ComponentProps> = () => {
           className="mb-4">
           <div className="mb-4">
             <input
+              autoComplete="off"
               {...register("phoneNumber", { required: true })}
               type="text"
               placeholder="Телефон"
@@ -51,6 +52,7 @@ const SignInPage: FC<ComponentProps> = () => {
           </div>
           <div className="mb-2">
             <input
+              autoComplete="off"
               {...register("password", { required: true })}
               type="password"
               placeholder="Пароль"

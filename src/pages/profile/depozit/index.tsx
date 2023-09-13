@@ -11,29 +11,25 @@ const Page: NextPageWithLayout<PageProps> = () => {
       <h1 className="mb-6 text-lg font-bold">Депозит</h1>
 
       <section className="bg-white dark:bg-gray-900">
-        <div className="mx-auto max-w-screen-xl">
-          <div>
-            <a
-              href="#"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-center text-base font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
-              Пополнить
-              <svg
-                className="ml-2 h-3.5 w-3.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 10">
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 5h12m0 0L9 1m4 4L9 9"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
+        <a
+          href="#"
+          className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-center text-base font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900">
+          Пополнить
+          <svg
+            className="ml-2 h-3.5 w-3.5"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 14 10">
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M1 5h12m0 0L9 1m4 4L9 9"
+            />
+          </svg>
+        </a>
 
         <div>
           <div className="mt-8 space-y-8 rounded-xl bg-gray-100 p-8 dark:bg-gray-800">

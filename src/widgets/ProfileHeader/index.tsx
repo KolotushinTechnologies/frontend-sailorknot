@@ -14,7 +14,7 @@ const ProfileHeader = () => {
       value: "/profile/settings",
     },
     {
-      label: "Заказы",
+      label: "Заявки",
       value: "/profile/orders",
     },
     {
