@@ -3,26 +3,33 @@ import useGetUser from "@/src/shared/hooks/useGetUser"
 import { UserService } from "@/src/shared/http/services/userService"
 import { CreateOneBody } from "@/src/shared/http/services/userService/types/createOne"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
-import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
-
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
-interface ComponentProps {
-  title: string
-}
+interface ComponentProps {}
 
 interface FormProps extends CreateOneBody {}
+interface SpecialProps {
+  label: string
+  value: string
+}
 
-export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создать пользователя" }) => {
+export const DashboardUpsertUser: FC<ComponentProps> = () => {
   const router = useRouter()
 
+  const availableSpecials: SpecialProps[] = [
+    {
+      label: "Агент",
+      value: "Агент",
+    },
+  ]
+
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
-  const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
+  const [selectedSpecial, selectedSpecialSet] = useState<SpecialProps | null>(null)
   const selectRef = useRef<HTMLSelectElement>(null)
 
   const onDeleteHandler = () => {
@@ -53,7 +60,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
   } = useForm<FormProps>()
 
   const onSelectSpecial = (item: string) => {
-    const matchItem = documents.find((filteredItem) => filteredItem.title === item)
+    const matchItem = availableSpecials.find((search) => search.label === item)
     if (matchItem) {
       selectedSpecialSet(matchItem)
     }
@@ -74,7 +81,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
   const onSubmit = handleSubmit(async (data, event) => {
     if (!selectedSpecial) return toast.error(`Выбирете должность`)
     if (!user) {
-      const parseData = { ...data, speciality: selectedSpecial.title }
+      const parseData = { ...data, speciality: selectedSpecial.label }
       try {
         const { data: createdUser } = await UserService.createOne(parseData)
         toast.success(createdUser.data)
@@ -86,7 +93,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
     }
     if (user) {
       const { comment, password, ...restInfo } = data
-      const parseData = { ...restInfo,  speciality: selectedSpecial.title }
+      const parseData = { ...restInfo, speciality: selectedSpecial.label }
       try {
         const { data: createdUser } = await UserService.updateUser({ user_id: user._id }, parseData)
         toast.success("Успешно обновлено")
@@ -108,13 +115,13 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
       formSetValue("phoneNumber", phoneNumber)
       formSetValue("city", city)
 
-      const matchSpecial = documents.find((document) => document.title === speciality)
+      const matchSpecial = availableSpecials.find((search) => search.label === speciality)
 
       if (matchSpecial) {
         selectedSpecialSet(matchSpecial)
-        formSetValue("speciality", matchSpecial.title)
+        formSetValue("speciality", matchSpecial.label)
         if (selectRef.current) {
-          selectRef.current.value = matchSpecial.title
+          selectRef.current.value = matchSpecial.label
         }
       }
     }
@@ -126,7 +133,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
       className="flex flex-col gap-7">
       <div className="grid gap-7">
         <div className="rounded-2xl bg-lightwhite p-6 dark:bg-white/5">
-          <h2 className="mb-4 text-lg font-semibold">{title}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{user ? `Обновить пользователя ${user._id}` : "Создать пользователя"}</h2>
           <div className="grid grid-flow-row gap-4">
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Имя</label>
@@ -222,7 +229,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
               <label
                 htmlFor="spec"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                Должность <span>{selectedSpecial?.title}</span>
+                Должность <span>{selectedSpecial?.label}</span>
               </label>
               <select
                 id="spec"
@@ -230,13 +237,13 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
                 onChange={(e) => onSelectSpecial(e.target.value)}
                 className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option>Выбирете должность</option>
-                {documents.map((item) => {
-                  const { title, documents } = item
+                {availableSpecials.map((item) => {
+                  const { label } = item
                   return (
                     <option
-                      key={item.title}
-                      value={`${title}`}>
-                      {title}
+                      key={label}
+                      value={`${label}`}>
+                      {label}
                     </option>
                   )
                 })}
