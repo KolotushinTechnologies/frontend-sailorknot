@@ -2,6 +2,7 @@ import { ReactElement } from "react"
 import DashboardLayout from "@/src/widgets/Layouts/DashboardLayout"
 import { NextPageWithLayout } from "@/pages/_app"
 import { DashBoardAllUsers } from "@/src/widgets/Dashboard/Users/DashBoardAllUsers"
+import { SiteLayout } from "@/src/widgets/Layouts/SiteLayout"
 
 interface PageProps {
   page: number
@@ -15,7 +16,9 @@ const Page: NextPageWithLayout<PageProps> = ({ page, take, orderBy }) => {
 
 Page.getLayout = function getLayout(page: ReactElement) {
   return (
-    <DashboardLayout>{page}</DashboardLayout>
+    <SiteLayout>
+      <DashboardLayout>{page}</DashboardLayout>
+    </SiteLayout>
   )
 }
 

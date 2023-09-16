@@ -4,6 +4,7 @@ import DashboardLayout from "@/src/widgets/Layouts/DashboardLayout"
 import { NextPageWithLayout } from "@/pages/_app"
 import { ParsedUrlQuery } from "querystring"
 import { DashboardUpsertUser } from "@/src/widgets/Dashboard/Users/DashboardUpsertUser"
+import { SiteLayout } from "@/src/widgets/Layouts/SiteLayout"
 
 interface PageProps {
   userId: string
@@ -23,7 +24,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ query,
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>
+  return (
+    <SiteLayout>
+    <DashboardLayout>{page}</DashboardLayout>
+  </SiteLayout>
+  )
 }
 
 export default Page

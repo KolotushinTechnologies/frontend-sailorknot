@@ -10,7 +10,6 @@ export interface UpdateUserBody {
   speciality: string
   phoneNumber: string
   city: string
-  comment: string
 }
 
 export interface UpdateUserResponse {

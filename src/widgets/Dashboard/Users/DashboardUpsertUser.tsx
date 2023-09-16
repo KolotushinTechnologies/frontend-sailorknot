@@ -74,7 +74,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
   const onSubmit = handleSubmit(async (data, event) => {
     if (!selectedSpecial) return toast.error(`Выбирете должность`)
     if (!user) {
-      const parseData = { ...data, comment: data.password, speciality: selectedSpecial.title }
+      const parseData = { ...data, speciality: selectedSpecial.title }
       try {
         const { data: createdUser } = await UserService.createOne(parseData)
         toast.success(createdUser.data)
@@ -85,7 +85,8 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
       }
     }
     if (user) {
-      const parseData = { ...data, comment: data.password, speciality: selectedSpecial.title }
+      const { comment, password, ...restInfo } = data
+      const parseData = { ...restInfo,  speciality: selectedSpecial.title }
       try {
         const { data: createdUser } = await UserService.updateUser({ user_id: user._id }, parseData)
         toast.success("Успешно обновлено")
@@ -196,10 +197,23 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Пароль</label>
               <input
+                readOnly={user ? true : false}
                 {...register("password")}
                 type="password"
                 defaultValue={user ? "*********" : ""}
                 placeholder="Пароль"
+                className="form-input"
+              />
+            </div>
+
+            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Комментарий</label>
+              <input
+                readOnly={user ? true : false}
+                {...register("comment")}
+                type="text"
+                defaultValue={user ? "" : ""}
+                placeholder="Комментарий"
                 className="form-input"
               />
             </div>

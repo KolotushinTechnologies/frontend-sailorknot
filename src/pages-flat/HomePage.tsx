@@ -24,7 +24,7 @@ const HomePage: FC<ComponentProps> = () => {
       <div
         className={clsx("main-content flex-1 overflow-hidden transition-all", {
           "md:ml-[212px]": isSideBarActive,
-          "hidden": !data,
+          hidden: !data,
         })}>
         <AppHeader
           isSideBarActive={false}
@@ -32,17 +32,32 @@ const HomePage: FC<ComponentProps> = () => {
         />
       </div>
       <div className="container flex min-h-screen max-w-md flex-col items-center justify-center space-y-2">
-        <h1 className="mb-2 text-center text-2xl rounded-xl bg-blue-100 px-4 py-1 font-bold uppercase">Sailorknot</h1>
-        <Link
-          href={!data ? `/auth/signin` : `/profile`}
-          className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
-          {!data ? `Вход` : `Профиль`}
-        </Link>
-        <Link
-          href="/auth/signup"
-          className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
-          Регистрация
-        </Link>
+        <h1 className="mb-2 rounded-xl bg-blue-100 px-4 py-1 text-center text-2xl font-bold uppercase">Sailorknot</h1>
+
+        <div className="flex flex-col space-y-2">
+          {!data ? (
+            <>
+              <Link
+                href={"/auth/signin"}
+                className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
+                Вход
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
+                Регистрация
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href={"/profile"}
+                className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
+                Профиль
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </>
   )

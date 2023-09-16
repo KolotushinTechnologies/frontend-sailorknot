@@ -19,7 +19,9 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ query,
 
 Page.getLayout = function getLayout(page: ReactElement) {
   return (
-    <DashboardLayout>{page}</DashboardLayout>
+    <SiteLayout>
+      <DashboardLayout>{page}</DashboardLayout>
+    </SiteLayout>
   )
 }
 

@@ -25,6 +25,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ page }) => {
   const [selectedItems, selectedItemsSet] = useState<GetAllResponse[]>([])
   const { users: items, loading, updUsers } = useGetUsers()
   const [filter, filterSet] = useState("")
+  const [currentUser, currentUserSet] = useState<GetAllResponse | null>(null)
 
   const onChangeFilter = (event: ChangeEvent<HTMLInputElement>) => filterSet(event.target.value.toLowerCase())
   const onClearFilter = () => filterSet("")
@@ -128,6 +129,17 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ page }) => {
     )
   }
 
+  useEffect(() => {
+    if (profile && items.length > 0) {
+      const match = items.find((search) => search._id === profile._id)
+      if (match) {
+        currentUserSet(match)
+      } else {
+        currentUserSet(null)
+      }
+    }
+  }, [items, profile])
+
   return (
     <>
       <div
@@ -190,14 +202,20 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ page }) => {
                 className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 pr-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                 placeholder="Поиск"
               />
-              <button onClick={onClearFilter} type="button" className="absolute inset-y-0 z-10 right-0 flex items-center pr-3">
+              <button
+                onClick={onClearFilter}
+                type="button"
+                className="absolute inset-y-0 right-0 z-10 inline-flex w-[38px] items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="h-6 w-6">
+                  className={clsx("h-6 w-6 text-gray-500 transition-all duration-300 dark:text-gray-400", {
+                    "pointer-events-none opacity-0": filter.length <= 0,
+                    "pointer-events-all opacity-100": filter.length > 0,
+                  })}>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -306,8 +324,8 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ page }) => {
                         </Link>{" "}
                         <button
                           onClick={onDeleteItem(item)}
-                          className={clsx("font-medium text-blue-600 hover:underline dark:text-blue-500", {
-                            hidden: profile && profile._id === item._id,
+                          className={clsx("font-medium inline-block text-blue-600 transition-all hover:underline dark:text-blue-500", {
+                            "opacity-0 pointer-events-none sr-only": currentUser && currentUser._id === item._id,
                           })}>
                           Удалить
                         </button>
