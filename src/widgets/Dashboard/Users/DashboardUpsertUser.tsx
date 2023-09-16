@@ -1,26 +1,64 @@
-import { User } from "@/src/shared/http/services/userService/types/getAll"
+import { documents } from "@/src/shared/documents"
+import useGetUser from "@/src/shared/hooks/useGetUser"
+import { UserService } from "@/src/shared/http/services/userService"
+import { CreateOneBody } from "@/src/shared/http/services/userService/types/createOne"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
+import { DocumentProps } from "@/src/shared/types/document"
+import clsx from "clsx"
 
 import Link from "next/link"
-import { ChangeEvent, FC, useState } from "react"
+import { useRouter } from "next/router"
+import { ChangeEvent, FC, useEffect, useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 
 interface ComponentProps {
-  title?: string
-  item?: User | undefined
+  title: string
 }
 
-export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создать пользователя", item }) => {
+interface FormProps extends CreateOneBody {}
+
+export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создать пользователя" }) => {
+  const router = useRouter()
+
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
+  const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
+  const selectRef = useRef<HTMLSelectElement>(null)
 
   const onDeleteHandler = () => {
-    if (!isDeleteChecked) return
+    if (!user || !isDeleteChecked) return
     ModalStore.update((store) => {
       store.modalStoreTitle = "Удалить?"
-      store.modalStoreConfirm = async () => console.log("Удалить да")
+      store.modalStoreConfirm = async () => {
+        try {
+          const deletedItem = await UserService.deleteOne(user._id)
+          toast.success(`Успешно удалено`)
+          router.push("/dashboard/users")
+        } catch (error) {
+          toast.error("Ошибка во время удаления")
+        } finally {
+          modalStoreToggle(false)
+        }
+      }
       store.modalStoreCancel = async () => console.log("Удалить нет")
     })
     modalStoreToggle(true)
   }
+
+  const {
+    register,
+    setValue: formSetValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormProps>()
+
+  const onSelectSpecial = (item: string) => {
+    const matchItem = documents.find((filteredItem) => filteredItem.title === item)
+    if (matchItem) {
+      selectedSpecialSet(matchItem)
+    }
+  }
+
   const onCheckHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     if (isChecked) {
@@ -29,151 +67,185 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
       isDeleteCheckedSet(false)
     }
   }
+
+  const userId = router.query.userId
+  const { user, loading } = useGetUser(`${userId}`)
+
+  const onSubmit = handleSubmit(async (data, event) => {
+    if (!selectedSpecial) return toast.error(`Выбирете должность`)
+    if (!user) {
+      const parseData = { ...data, comment: data.password, speciality: selectedSpecial.title }
+      try {
+        const { data: createdUser } = await UserService.createOne(parseData)
+        toast.success(createdUser.data)
+        console.log(createdUser.data)
+      } catch (error) {
+        console.log(error)
+        toast.error("Ошибка")
+      }
+    }
+    if (user) {
+      const parseData = { ...data, comment: data.password, speciality: selectedSpecial.title }
+      try {
+        const { data: createdUser } = await UserService.updateUser({ user_id: user._id }, parseData)
+        toast.success("Успешно обновлено")
+      } catch (error) {
+        console.log(error)
+        toast.error("Ошибка при обновлении")
+      }
+    }
+  })
+
+  useEffect(() => {
+    if (user) {
+      const { name, lastname, surname, city, dateBirth, phoneNumber, speciality } = user
+
+      formSetValue("name", name)
+      formSetValue("lastname", lastname)
+      formSetValue("surname", surname)
+      formSetValue("dateBirth", dateBirth)
+      formSetValue("phoneNumber", phoneNumber)
+      formSetValue("city", city)
+
+      const matchSpecial = documents.find((document) => document.title === speciality)
+
+      if (matchSpecial) {
+        selectedSpecialSet(matchSpecial)
+        formSetValue("speciality", matchSpecial.title)
+        if (selectRef.current) {
+          selectRef.current.value = matchSpecial.title
+        }
+      }
+    }
+  }, [user])
+
   return (
-    <div className="flex flex-col gap-7">
-      <div className="grid gap-7 lg:grid-cols-2">
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-7">
+      <div className="grid gap-7">
         <div className="rounded-2xl bg-lightwhite p-6 dark:bg-white/5">
           <h2 className="mb-4 text-lg font-semibold">{title}</h2>
           <div className="grid grid-flow-row gap-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-                <input
-                  type="text"
-                  placeholder="Имя"
-                  defaultValue={item ? item.email : ""}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  defaultValue={item ? item.email : ""}
-                  className="form-input"
-                />
-              </div>
-            </div>
-
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Email</label>
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Имя</label>
               <input
+                {...register("name", { required: true })}
                 type="text"
-                defaultValue={item ? item.email : ""}
-                placeholder="Email"
+                placeholder="Имя"
+                defaultValue={user ? user.name : ""}
                 className="form-input"
               />
             </div>
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Телефон 2</label>
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Фамилия</label>
               <input
+                {...register("lastname", { required: true })}
                 type="text"
-                placeholder="Телефон 2"
+                placeholder="Фамилия"
+                defaultValue={user ? user.lastname : ""}
                 className="form-input"
               />
             </div>
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Описание</label>
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Отчество</label>
               <input
+                {...register("surname", { required: true })}
                 type="text"
-                placeholder="Описание"
+                defaultValue={user ? user.surname : ""}
+                placeholder="Отчество"
                 className="form-input"
               />
             </div>
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Описание 2</label>
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата рождения</label>
               <input
+                {...register("dateBirth", { required: true })}
                 type="text"
-                placeholder="Описание 2"
+                defaultValue={user ? user.dateBirth : ""}
+                placeholder="Дата рождения"
                 className="form-input"
               />
             </div>
-          </div>
-        </div>
 
-        <div className="rounded-2xl bg-lightwhite p-6 dark:bg-white/5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <h2 className="text-sm font-semibold">Уведомления</h2>
-            <div className="flex items-center gap-2">
-              <button className="btn rounded-md bg-lightpurple-100 px-2 py-[5px] text-xs">Отмена</button>
-              <Link
-                href="/"
-                className="btn rounded-md bg-lightpurple-100 px-2 py-[5px] text-xs">
-                Сохранить изменения
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-flow-row divide-y divide-black/10 dark:divide-white/10">
-            <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-5 sm:gap-6">
-              <p className="text-sm">Уведомление 1</p>
-              <div className="flex items-center gap-9">
-                <div className="flex items-center">
-                  <input
-                    id="email1"
-                    type="checkbox"
-                    className="h-[18px] w-[18px] rounded border-black/20 bg-white text-black focus:outline-0 focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 dark:border-white/20 dark:bg-transparent dark:text-white/20"
-                  />
-                  <label
-                    htmlFor="email1"
-                    className="ml-2 ">
-                    По почте
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    id="phone1"
-                    type="checkbox"
-                    className="h-[18px] w-[18px] rounded border-black/20 bg-white text-black focus:outline-0 focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 dark:border-white/20 dark:bg-transparent dark:text-white/20"
-                  />
-                  <label
-                    htmlFor="phone1"
-                    className="ml-2 ">
-                    По телефону
-                  </label>
-                </div>
-              </div>
+            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Телефон</label>
+              <input
+                {...register("phoneNumber", { required: true })}
+                type="text"
+                defaultValue={user ? user.phoneNumber : ""}
+                placeholder="Телефон"
+                className="form-input"
+              />
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-5 sm:gap-6">
-              <p className="text-sm">Уведомление 2</p>
-              <div className="flex items-center gap-9">
-                <div className="flex items-center">
-                  <input
-                    id="email2"
-                    type="checkbox"
-                    className="h-[18px] w-[18px] rounded border-black/20 bg-white text-black focus:outline-0 focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 dark:border-white/20 dark:bg-transparent dark:text-white/20"
-                  />
-                  <label
-                    htmlFor="email2"
-                    className="ml-2">
-                    По почте
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    id="phone2"
-                    type="checkbox"
-                    className="h-[18px] w-[18px] rounded border-black/20 bg-white text-black focus:outline-0 focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 dark:border-white/20 dark:bg-transparent dark:text-white/20"
-                  />
-                  <label
-                    htmlFor="phone2"
-                    className="ml-2">
-                    По телефону
-                  </label>
-                </div>
-              </div>
+            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Город</label>
+              <input
+                {...register("city", { required: true })}
+                type="text"
+                defaultValue={user ? user.city : ""}
+                placeholder="Город"
+                className="form-input"
+              />
+            </div>
+
+            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Пароль</label>
+              <input
+                {...register("password")}
+                type="password"
+                defaultValue={user ? "*********" : ""}
+                placeholder="Пароль"
+                className="form-input"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="spec"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                Должность <span>{selectedSpecial?.title}</span>
+              </label>
+              <select
+                id="spec"
+                ref={selectRef}
+                onChange={(e) => onSelectSpecial(e.target.value)}
+                className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <option>Выбирете должность</option>
+                {documents.map((item) => {
+                  const { title, documents } = item
+                  return (
+                    <option
+                      key={item.title}
+                      value={`${title}`}>
+                      {title}
+                    </option>
+                  )
+                })}
+              </select>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-lightwhite p-6 dark:bg-white/5">
+      <div
+        className={clsx("rounded-2xl bg-lightwhite p-6 dark:bg-white/5", {
+          hidden: !user,
+          block: user,
+        })}>
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <h2 className="text-sm font-semibold">Удалить аккаунт</h2>
-          <button disabled={!onDeleteHandler} onClick={onDeleteHandler} className="btn rounded-md bg-lightred px-2 py-[5px] text-xs text-white">Удалить аккаунт</button>
+          <button
+            type="button"
+            disabled={!onDeleteHandler}
+            onClick={onDeleteHandler}
+            className="btn rounded-md bg-lightred px-2 py-[5px] text-xs text-white">
+            Удалить аккаунт
+          </button>
         </div>
         <div className="mb-5 flex items-start gap-1 rounded-lg bg-lightpurple-100/50 p-4 dark:bg-white/5">
           <div className="flex-none">
@@ -199,7 +271,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
           <div>
             <p className="text-xs">Вы удаляете аккаунт</p>
             <p className="text-xs text-black/40 dark:text-white/40">
-            После удаления, невозможно восстановить{" "}
+              После удаления, невозможно восстановить{" "}
               <Link
                 href="/"
                 className="text-lightpurple-300">
@@ -223,6 +295,12 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({ title = "Создат�
           </label>
         </div>
       </div>
-    </div>
+
+      <button
+        type="submit"
+        className="w-full rounded-lg border border-black bg-black px-4 py-2 text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
+        <span>{!user ? "Создать" : "Обновить"}</span>
+      </button>
+    </form>
   )
 }

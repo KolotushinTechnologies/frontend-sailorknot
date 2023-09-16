@@ -1,6 +1,4 @@
-import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { documents } from "@/src/shared/documents"
-import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
 import { DocumentProps } from "@/src/shared/types/document"
 import SelectMultipleImages from "@/src/widgets/SelectImages/selectMultipleImages"
@@ -109,7 +107,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
       console.log(error)
     }
   })
-
+  
   useEffect(() => {
     if (profileData) {
       const { name, lastname, surname, balance, city, dateBirth, phoneNumber, speciality, documents: profileDocuments } = profileData
@@ -195,14 +193,15 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
           <div className="mb-4">
             <label
-              htmlFor="countries"
+              htmlFor="spec"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Должность <span>{selectedSpecial?.title}</span>
             </label>
             <select
+                id="spec"
               ref={selectRef}
               onChange={(e) => onSelectSpecial(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+              className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
               <option>Выбирете должность</option>
               {documents.map((item) => {
                 const { title, documents } = item

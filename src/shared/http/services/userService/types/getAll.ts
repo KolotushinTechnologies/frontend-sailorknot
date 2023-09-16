@@ -1,23 +1,16 @@
 export interface GetAllResponse {
-  meta: Meta
-  users: User[]
-}
-
-interface Meta {
-  page: number
-  total: number
-  pageSize: number
-  pageCount: number
-}
-
-export interface User {
-  id: string
-  email: string
-  isActivated: boolean
-  roles: Role[]
-}
-
-interface Role {
-  id: number
+  _id: string
   name: string
+  lastname: string
+  surname: string
+  dateBirth: string
+  speciality: string
+  phoneNumber: string
+  city: string
+  balance: number
+  roles: string[]
+  documents: string[]
+  createdAt: string
+  updatedAt: string
+  __v: number
 }

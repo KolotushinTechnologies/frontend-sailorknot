@@ -1,29 +1,35 @@
-import { ChangeEvent, FC, use } from "react"
+import { ChangeEvent, FC, useEffect } from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
-import { GetAllResponse, User } from "@/src/shared/http/services/userService/types/getAll"
+import { GetAllResponse } from "@/src/shared/http/services/userService/types/getAll"
 import clsx from "clsx"
-import AdminPagination from "../../Pagination/AdminPagination"
-import { UserService } from "@/src/shared/http/services/userService"
 import toast from "react-hot-toast"
+import useGetUsers from "@/src/shared/hooks/useGetUsers"
+import { UserService } from "@/src/shared/http/services/userService"
+import { ProfileStore } from "@/src/shared/store/profileStore"
 
 interface ComponentProps {
-  items: GetAllResponse
   page: number
   take: number
   orderBy: string
 }
 
-export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
+export const DashBoardAllUsers: FC<ComponentProps> = ({ page }) => {
+  const { data: profile } = ProfileStore.useState((store) => store)
   const [animationParent] = useAutoAnimate()
   const router = useRouter()
-  const headerTable = ["Email", "Роли", "Активирован", "Действия"]
-  const [selectedItems, selectedItemsSet] = useState<User[]>([])
+  const headerTable = ["Email", "Роли", "Баланс", "Действия"]
+  const [selectedItems, selectedItemsSet] = useState<GetAllResponse[]>([])
+  const { users: items, loading, updUsers } = useGetUsers()
+  const [filter, filterSet] = useState("")
 
-  const onSelect = (item: User) => (e: ChangeEvent<HTMLInputElement>) => {
+  const onChangeFilter = (event: ChangeEvent<HTMLInputElement>) => filterSet(event.target.value.toLowerCase())
+  const onClearFilter = () => filterSet("")
+
+  const onSelect = (item: GetAllResponse) => (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     selectedItemsSet((prevItems) => {
       if (isChecked) {
@@ -37,37 +43,68 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
   const onSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     if (isChecked) {
-      selectedItemsSet(items.users)
+      selectedItemsSet(items)
     } else {
       selectedItemsSet([])
     }
   }
 
-  const onArhivateItem = () => {
-    ModalStore.update((store) => {
-      store.modalStoreTitle = `В архив ${selectedItems.length} шт.?`
-      store.modalStoreConfirm = async () => console.log("В архив да")
-      store.modalStoreCancel = async () => console.log("В архив нет")
-    })
-    modalStoreToggle(true)
-  }
+  // TODO: Add if need
+  // const onArhivateItem = () => {
+  //   ModalStore.update((store) => {
+  //     store.modalStoreTitle = `В архив ${selectedItems.length} шт.?`
+  //     store.modalStoreConfirm = async () => console.log("В архив да")
+  //     store.modalStoreCancel = async () => console.log("В архив нет")
+  //   })
+  //   modalStoreToggle(true)
+  // }
 
-  const onDeleteItem = async () => {
-    ModalStore.update((store) => {
-      store.modalStoreTitle = `Удалить  ${selectedItems.length} шт.?`
-      store.modalStoreConfirm = async () => {
-        toast.success("Удалено")
-        // try {
-        //   const deleteUsers = await Promise.allSettled(selectedItems.map(({ id }) => UserService.deleteOne(id)))
-        //   selectedItemsSet([])
-        //   console.log('deleteUsers: ', deleteUsers);
-
-        //   router.push(router.asPath)
-        // } catch (error) {}
-      }
-      store.modalStoreCancel = async () => console.log("Удалить нет")
-    })
+  const onDeleteItem = (user: null | GetAllResponse) => async (e: any) => {
     modalStoreToggle(true)
+    if (user) {
+      ModalStore.update((store) => {
+        store.modalStoreTitle = `Удалить ${user.name}?`
+        store.modalStoreConfirm = async () => {
+          try {
+            const deletedItems = await UserService.deleteOne(user._id)
+            toast.success(`Успешно удалено`)
+            router.push("/dashboard/users")
+          } catch (error) {
+            toast.error("Ошибка во время удаления")
+          } finally {
+            updUsers()
+            selectedItemsSet([])
+            modalStoreToggle(false)
+          }
+        }
+
+        store.modalStoreCancel = async () => {
+          modalStoreToggle(false)
+        }
+      })
+    }
+    if (!user) {
+      ModalStore.update((store) => {
+        store.modalStoreTitle = `Удалить ${selectedItems.length} ?`
+        store.modalStoreConfirm = async () => {
+          try {
+            const deletedItems = await Promise.allSettled(selectedItems.map(({ _id }) => UserService.deleteOne(_id)))
+
+            toast.success(`Успешно удалено ${deletedItems.length} шт.`)
+          } catch (error) {
+            toast.error("Ошибка во время удаления")
+          } finally {
+            updUsers()
+            selectedItemsSet([])
+            modalStoreToggle(false)
+          }
+        }
+
+        store.modalStoreCancel = async () => {
+          modalStoreToggle(false)
+        }
+      })
+    }
   }
 
   const renderActions = () => {
@@ -75,27 +112,31 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
     return (
       <div className="mr-2 flex items-center space-x-2 whitespace-nowrap">
         <button
-          onClick={onDeleteItem}
+          onClick={onDeleteItem(null)}
           className="inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-200 dark:border-red-600 dark:bg-red-800 dark:text-red-400 dark:hover:border-red-600 dark:hover:bg-red-700 dark:focus:ring-red-700"
           type="button">
           <span className="sr-only">Удалить</span>Удалить
         </button>
-        <button
+        {/* TODO: Add if need */}
+        {/* <button
           onClick={onArhivateItem}
           className="inline-flex items-center rounded-lg border border-yellow-300 bg-white px-3 py-1.5 text-sm font-medium text-yellow-500 hover:bg-yellow-100 focus:outline-none focus:ring-4 focus:ring-yellow-200 dark:border-yellow-600 dark:bg-yellow-800 dark:text-yellow-400 dark:hover:border-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-700"
           type="button">
           <span className="sr-only">В архив</span>В архив
-        </button>
+        </button> */}
       </div>
     )
   }
 
   return (
     <>
-      <AdminPagination
-        currentPage={page}
-        meta={items.meta}
-      />
+      <div
+        className="flex flex-col items-start justify-between space-y-3 p-2 md:flex-row md:items-center md:space-y-0"
+        aria-label="Table navigation">
+        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+          Всего <span className="font-semibold text-gray-900 dark:text-white">{items.length}</span>
+        </span>
+      </div>
       <div
         ref={animationParent}
         className="text-left dark:border-white/10 dark:bg-white/5">
@@ -142,11 +183,28 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
                 </svg>
               </div>
               <input
+                onChange={onChangeFilter}
+                value={filter}
                 type="text"
                 id="table-search-users"
-                className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 pr-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                 placeholder="Поиск"
               />
+              <button onClick={onClearFilter} type="button" className="absolute inset-y-0 z-10 right-0 flex items-center pr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="h-6 w-6">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
           <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
@@ -160,7 +218,7 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
                       id="checkbox-all-search"
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                      checked={selectedItems.length === items.users.length}
+                      checked={selectedItems.length === items?.length}
                       onChange={onSelectAll}
                     />
                     <label
@@ -183,79 +241,88 @@ export const DashBoardAllUsers: FC<ComponentProps> = ({ items, page }) => {
               </tr>
             </thead>
             <tbody>
-              {items.users.map((item, indx) => {
-                return (
-                  <tr
-                    key={indx}
-                    className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
-                    <td className="w-4 p-4">
-                      <div className="flex items-center">
-                        <input
-                          onChange={onSelect(item)}
-                          id={`${indx}`}
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
-                          checked={selectedItems.includes(item)}
+              {items
+                .filter((item) => item.phoneNumber.includes(filter))
+                .map((item, indx) => {
+                  return (
+                    <tr
+                      key={indx}
+                      className="border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600">
+                      <td className="w-4 p-4">
+                        <div className="flex items-center">
+                          <input
+                            onChange={onSelect(item)}
+                            id={`${indx}`}
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600 dark:focus:ring-offset-gray-800"
+                            checked={selectedItems.includes(item)}
+                          />
+                          <label
+                            htmlFor={`${indx}`}
+                            className="sr-only">
+                            checkbox
+                          </label>
+                        </div>
+                      </td>
+                      <th
+                        scope="row"
+                        className="flex items-center whitespace-nowrap px-6 py-4 text-gray-900 dark:text-white">
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png"
+                          alt="Jese image"
                         />
-                        <label
-                          htmlFor={`${indx}`}
-                          className="sr-only">
-                          checkbox
-                        </label>
-                      </div>
-                    </td>
-                    <th
-                      scope="row"
-                      className="flex items-center whitespace-nowrap px-6 py-4 text-gray-900 dark:text-white">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/681px-Placeholder_view_vector.svg.png"
-                        alt="Jese image"
-                      />
-                      <div className="pl-3">
-                        <div className="text-base font-semibold">{item.email}</div>
-                        <div className="font-normal text-gray-500">{item.email}</div>
-                      </div>
-                    </th>
-                    <td className="space-x-2 px-6 py-4">
-                      {item.roles.map((role) => (
-                        <span key={role.id}>{role.name}</span>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div
-                          className={clsx("mr-2 h-2.5 w-2.5 rounded-full", {
-                            "bg-green-500": item.isActivated,
-                            "bg-red-500": !item.isActivated,
-                          })}></div>
-                        <span>{item.isActivated ? "true" : "false"}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Link
-                        href={`${router.pathname}/${item.id}/update`}
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                        Редактировать
-                      </Link>
-                      {" | "}
-                      <button
-                        onClick={onDeleteItem}
-                        className="font-medium text-blue-600 hover:underline dark:text-blue-500">
-                        Удалить
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
+                        <div className="pl-3">
+                          <div className="text-base font-semibold">{item.name}</div>
+                          <div className="font-normal text-gray-500">{item.name}</div>
+                        </div>
+                      </th>
+                      <td className="space-x-2 px-6 py-4">
+                        {item.roles.map((role, indx) => {
+                          const isLast = indx === item.roles.length - 1
+                          return (
+                            <span key={role}>
+                              {role}
+                              {isLast ? null : ","}
+                            </span>
+                          )
+                        })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div
+                            className={clsx("mr-2 h-2.5 w-2.5 rounded-full", {
+                              "bg-green-500": item.balance > 0,
+                              "bg-red-500": item.balance <= 0,
+                            })}></div>
+                          <span>{item.balance}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Link
+                          href={`${router.pathname}/${item._id}/update`}
+                          className="font-medium text-blue-600 hover:underline dark:text-blue-500">
+                          Редактировать
+                        </Link>{" "}
+                        <button
+                          onClick={onDeleteItem(item)}
+                          className={clsx("font-medium text-blue-600 hover:underline dark:text-blue-500", {
+                            hidden: profile && profile._id === item._id,
+                          })}>
+                          Удалить
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
             </tbody>
           </table>
         </div>
       </div>
-      <AdminPagination
+      {/* <AdminPagination
         currentPage={page}
         meta={items.meta}
-      />
+      /> */}
     </>
   )
 }

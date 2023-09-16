@@ -9,11 +9,9 @@ export const ConfirmModal: FC<ComponentProps> = ({}) => {
 
   const confirmHandler = () => {
     if (modalStoreConfirm) modalStoreConfirm()
-    if (modalStoreCancel) modalStoreCancel()
     modalStoreToggle(false)
   }
   const cancelHandler = () => {
-    if (modalStoreConfirm) modalStoreConfirm()
     if (modalStoreCancel) modalStoreCancel()
     modalStoreToggle(false)
   }
@@ -26,7 +24,7 @@ export const ConfirmModal: FC<ComponentProps> = ({}) => {
       <Dialog
         as="div"
         className="relative z-[500]"
-        onClose={() => modalStoreToggle(false)}>
+        onClose={cancelHandler}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -51,7 +49,7 @@ export const ConfirmModal: FC<ComponentProps> = ({}) => {
               <Dialog.Panel className="relative max-h-full w-full max-w-md">
                 <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
                   <button
-                    onClick={() => modalStoreToggle(false)}
+                    onClick={cancelHandler}
                     type="button"
                     className="absolute right-2.5 top-3 ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-hide="popup-modal">

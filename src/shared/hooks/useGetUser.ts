@@ -1,24 +1,29 @@
-import { useEffect } from "react"
-import { AuthService } from "../http/services/authService"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { useRouter } from "next/router"
-import { profileStoreGetUser } from "../store/profileStore"
+import { UserService } from "../http/services/userService"
+import { GetOneResponse } from "../http/services/userService/types/getOneById"
 
-const useGetUser = () => {
-  const router = useRouter()
-    
-  const getUser = async () => {
+const useGetUser = (userId: string) => {
+  const [user, setUser] = useState<GetOneResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const getUsers = async () => {
+    if (!userId || userId.length === 0 || userId === "undefined" || userId === undefined) return
     try {
-      const {data} = await AuthService.getUser()
-      profileStoreGetUser(data)
+      const { data } = await UserService.getOneById(userId)
+      setUser(data)
     } catch (error) {
-      toast.error("Выполните вход")
+      toast.error("Failed to fetch user. Please log in or try again later.")
+    } finally {
+      setLoading(false) // Error occurred, set loading to false
     }
   }
-  
+
   useEffect(() => {
-    getUser()
+    getUsers()
   }, [])
+
+  return { user, loading }
 }
 
 export default useGetUser

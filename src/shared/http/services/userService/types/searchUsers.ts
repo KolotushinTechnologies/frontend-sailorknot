@@ -1,4 +1,4 @@
-export interface GetOneResponse {
+export interface SearchUsersRespone {
   _id: string
   name: string
   lastname: string

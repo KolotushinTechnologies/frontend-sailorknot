@@ -1,7 +1,7 @@
-import useGetUser from "@/src/shared/hooks/useGetUser"
+import useGetMe from "@/src/shared/hooks/useGetMe"
 
 const SiteLayout = ({ children }: any) => {
-  useGetUser()
+  useGetMe()
   return (
     <>
       {children}
