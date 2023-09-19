@@ -3,7 +3,9 @@ import useGetUser from "@/src/shared/hooks/useGetUser"
 import { UserService } from "@/src/shared/http/services/userService"
 import { CreateOneBody } from "@/src/shared/http/services/userService/types/createOne"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
+import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
+
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react"
@@ -13,23 +15,12 @@ import toast from "react-hot-toast"
 interface ComponentProps {}
 
 interface FormProps extends CreateOneBody {}
-interface SpecialProps {
-  label: string
-  value: string
-}
 
 export const DashboardUpsertUser: FC<ComponentProps> = () => {
   const router = useRouter()
 
-  const availableSpecials: SpecialProps[] = [
-    {
-      label: "Агент",
-      value: "Агент",
-    },
-  ]
-
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
-  const [selectedSpecial, selectedSpecialSet] = useState<SpecialProps | null>(null)
+  const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
   const selectRef = useRef<HTMLSelectElement>(null)
 
   const onDeleteHandler = () => {
@@ -60,9 +51,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
   } = useForm<FormProps>()
 
   const onSelectSpecial = (item: string) => {
-    const matchItem = availableSpecials.find((search) => search.label === item)
+    const matchItem = documents.find((filteredItem) => filteredItem.title === item)
     if (matchItem) {
       selectedSpecialSet(matchItem)
+    } else {
     }
   }
 
@@ -80,8 +72,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
 
   const onSubmit = handleSubmit(async (data, event) => {
     if (!selectedSpecial) return toast.error(`Выбирете должность`)
+
     if (!user) {
-      const parseData = { ...data, speciality: selectedSpecial.label }
+      const parseData = { ...data, speciality: selectedSpecial.title }
+
       try {
         const { data: createdUser } = await UserService.createOne(parseData)
         toast.success(createdUser.data)
@@ -91,9 +85,11 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
         toast.error("Ошибка")
       }
     }
+
     if (user) {
       const { comment, password, ...restInfo } = data
-      const parseData = { ...restInfo, speciality: selectedSpecial.label }
+      const parseData = { ...restInfo, speciality: selectedSpecial.title }
+
       try {
         const { data: createdUser } = await UserService.updateUser({ user_id: user._id }, parseData)
         toast.success("Успешно обновлено")
@@ -115,17 +111,42 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       formSetValue("phoneNumber", phoneNumber)
       formSetValue("city", city)
 
-      const matchSpecial = availableSpecials.find((search) => search.label === speciality)
+      const matchSpecial = documents.find((document) => document.title === speciality)
 
       if (matchSpecial) {
         selectedSpecialSet(matchSpecial)
-        formSetValue("speciality", matchSpecial.label)
+        formSetValue("speciality", matchSpecial.title)
         if (selectRef.current) {
-          selectRef.current.value = matchSpecial.label
+          selectRef.current.value = matchSpecial.title
         }
       }
     }
   }, [user])
+
+  const SpetialOptions = () => {
+    if (!user || (user && user.speciality.toLowerCase().includes("агент"))) {
+      return (
+        <option
+          key={documents[0].title}
+          value={`${documents[0].title}`}>
+          {documents[0].title}
+        </option>
+      )
+    } else if (user && !user.speciality.toLowerCase().includes("агент")) {
+      return documents.slice(1).map((item) => {
+        const { title, documents } = item
+        return (
+          <option
+            key={item.title}
+            value={`${title}`}>
+            {title}
+          </option>
+        )
+      })
+    } else {
+      return null
+    }
+  }
 
   return (
     <form
@@ -136,23 +157,23 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
           <h2 className="mb-4 text-lg font-semibold">{user ? `Обновить пользователя ${user._id}` : "Создать пользователя"}</h2>
           <div className="grid grid-flow-row gap-4">
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
-              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Имя</label>
-              <input
-                {...register("name", { required: true })}
-                type="text"
-                placeholder="Имя"
-                defaultValue={user ? user.name : ""}
-                className="form-input"
-              />
-            </div>
-
-            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Фамилия</label>
               <input
                 {...register("lastname", { required: true })}
                 type="text"
                 placeholder="Фамилия"
                 defaultValue={user ? user.lastname : ""}
+                className="form-input"
+              />
+            </div>
+
+            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Имя</label>
+              <input
+                {...register("name", { required: true })}
+                type="text"
+                placeholder="Имя"
+                defaultValue={user ? user.name : ""}
                 className="form-input"
               />
             </div>
@@ -201,11 +222,14 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
               />
             </div>
 
-            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+            <div
+              className={clsx("relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5", {
+                hidden: user,
+              })}>
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Пароль</label>
               <input
                 readOnly={user ? true : false}
-                {...register("password")}
+                {...register("password", { required: !user ? true : false })}
                 type="password"
                 defaultValue={user ? "*********" : ""}
                 placeholder="Пароль"
@@ -213,7 +237,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
               />
             </div>
 
-            <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+            <div
+              className={clsx("relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5", {
+                hidden: user,
+              })}>
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Комментарий</label>
               <input
                 readOnly={user ? true : false}
@@ -229,7 +256,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
               <label
                 htmlFor="spec"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                Должность <span>{selectedSpecial?.label}</span>
+                Должность <span>{selectedSpecial?.title}</span>
               </label>
               <select
                 id="spec"
@@ -237,16 +264,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
                 onChange={(e) => onSelectSpecial(e.target.value)}
                 className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option>Выбирете должность</option>
-                {availableSpecials.map((item) => {
-                  const { label } = item
-                  return (
-                    <option
-                      key={label}
-                      value={`${label}`}>
-                      {label}
-                    </option>
-                  )
-                })}
+                <SpetialOptions />
               </select>
             </div>
           </div>

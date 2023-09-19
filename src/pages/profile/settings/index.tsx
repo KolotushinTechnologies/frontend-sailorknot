@@ -58,7 +58,6 @@ const Page: NextPageWithLayout<PageProps> = () => {
         formData.set("statusChangeFile", "false")
 
         useUpdateProfile(formData, router)
-        
       }
 
       // Если специализация такая же, но загружены новые изображения
@@ -99,7 +98,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
         for (const file of parsedImages) {
           formData.append("documents", file)
         }
-        
+
         useUpdateProfile(formData, router)
       }
     } catch (error) {
@@ -107,7 +106,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
       console.log(error)
     }
   })
-  
+
   useEffect(() => {
     if (profileData) {
       const { name, lastname, surname, balance, city, dateBirth, phoneNumber, speciality, documents: profileDocuments } = profileData
@@ -138,15 +137,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           onSubmit={onSubmit}
           className="mb-4">
           <div className="mb-4">
-            <input
-              {...register("name", { required: true })}
-              type="text"
-              placeholder="Имя"
-              className="form-input"
-            />
-          </div>
-
-          <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Фамилия</label>
             <input
               {...register("lastname", { required: true })}
               type="text"
@@ -156,6 +147,17 @@ const Page: NextPageWithLayout<PageProps> = () => {
           </div>
 
           <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Имя</label>
+            <input
+              {...register("name", { required: true })}
+              type="text"
+              placeholder="Имя"
+              className="form-input"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Отчество</label>
             <input
               {...register("surname", { required: true })}
               type="text"
@@ -165,6 +167,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           </div>
 
           <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата рождения</label>
             <input
               {...register("dateBirth", { required: true })}
               type="text"
@@ -174,6 +177,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           </div>
 
           <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Номер телефона</label>
             <input
               {...register("phoneNumber", { required: true })}
               type="text"
@@ -183,6 +187,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           </div>
 
           <div className="mb-4">
+            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Город присутствия</label>
             <input
               {...register("city", { required: true })}
               type="text"
@@ -198,12 +203,12 @@ const Page: NextPageWithLayout<PageProps> = () => {
               Должность <span>{selectedSpecial?.title}</span>
             </label>
             <select
-                id="spec"
+              id="spec"
               ref={selectRef}
               onChange={(e) => onSelectSpecial(e.target.value)}
               className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
               <option>Выбирете должность</option>
-              {documents.map((item) => {
+              {documents.slice(1).map((item) => {
                 const { title, documents } = item
                 return (
                   <option

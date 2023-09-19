@@ -4,8 +4,10 @@ import ProfileHeader from "@/src/widgets/ProfileHeader"
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { useMedia } from "react-use"
+import { ProfileStore } from "@/src/shared/store/profileStore"
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
+  const { data } = ProfileStore.useState((store) => store)
   const isSmall = useMedia("(max-width: 768px)", true)
   const [isSideBarActive, isSideBarActiveSet] = useState(isSmall ? false : true)
   const toggleSideBarActiveHandler = () => isSideBarActiveSet((prev) => !prev)

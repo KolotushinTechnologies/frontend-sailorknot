@@ -81,20 +81,21 @@ const SignUpPage: FC<ComponentProps> = () => {
           <form
             onSubmit={onSubmit}
             className="mb-4">
-            <div className="mb-4">
-              <input
-                {...register("name", { required: true })}
-                type="text"
-                placeholder="Имя"
-                className="form-input"
-              />
-            </div>
 
             <div className="mb-4">
               <input
                 {...register("lastname", { required: true })}
                 type="text"
                 placeholder="Фамилия"
+                className="form-input"
+              />
+            </div>
+            
+            <div className="mb-4">
+              <input
+                {...register("name", { required: true })}
+                type="text"
+                placeholder="Имя"
                 className="form-input"
               />
             </div>
@@ -198,7 +199,7 @@ const SignUpPage: FC<ComponentProps> = () => {
                 onChange={(e) => onSelectSpecial(e.target.value)}
                 className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option>Выбирете должность</option>
-                {documents.map((item) => {
+                {documents.slice(1).map((item) => {
                   const { title, documents } = item
                   return (
                     <option

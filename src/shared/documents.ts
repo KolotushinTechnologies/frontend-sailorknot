@@ -2,6 +2,10 @@ import { DocumentProps } from "./types/document";
 
 export const documents: DocumentProps[] = [
   {
+    title: "Агент",
+    documents: [],
+  },
+  {
     title: "Матрос вахтенный",
     documents: [
       { name: "Загранпаспорт" },
