@@ -2,14 +2,17 @@ import Link from "next/link"
 import { FC, useRef } from "react"
 import clsx from "clsx"
 import { useClickAway } from "react-use"
+import { GetOneResponse } from "@/src/shared/http/services/userService/types/getOneById"
 
 interface ComponentProps {
   isSideBarActive: boolean
   handler: () => void
   isSmall: boolean
+  profileData: GetOneResponse | null
 }
 
-const AppSidebar: FC<ComponentProps> = ({ isSideBarActive, handler, isSmall }) => {
+const AppSidebar: FC<ComponentProps> = ({ isSideBarActive, handler, isSmall, profileData }) => {
+
   const ref = useRef(null)
   useClickAway(ref, () => {
     if (isSmall) {
@@ -19,11 +22,14 @@ const AppSidebar: FC<ComponentProps> = ({ isSideBarActive, handler, isSmall }) =
   return (
     <nav
       ref={ref}
-      className={clsx("sidebar fixed bottom-0 top-0 z-[200] w-[212px] flex-none border-r border-black/10 transition-all duration-300 dark:border-white/10", {
+      className={clsx("sidebar group fixed bottom-0 top-0 z-[200] w-[212px] flex-none border-r border-black/10 transition-all duration-300 dark:border-white/10", {
         "left-0": isSideBarActive,
         "left-[-212px]": !isSideBarActive,
+
+        "animate-pulse bg-white dark:bg-black pointer-events-none": !profileData,
+        "bg-white dark:bg-black": profileData,
       })}>
-      <div className="h-full bg-white dark:bg-black">
+      <div className="h-full">
         <div className="flex p-4">
           <Link
             href="/"

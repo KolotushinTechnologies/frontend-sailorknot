@@ -1,6 +1,7 @@
 import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { documents } from "@/src/shared/documents"
 import { formatDate } from "@/src/shared/helpers/formatDate"
+import DocViewer, { DocViewerRenderers,  } from "@cyntler/react-doc-viewer";
 import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
 import { DocumentProps } from "@/src/shared/types/document"
@@ -39,7 +40,9 @@ const SignUpPage: FC<ComponentProps> = () => {
   const onSubmit = handleSubmit(async (data, event) => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
-    if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
+
+    // TODO: Не обязательно
+    // if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
 
     try {
       const { confirmPassword, ...rest } = data as unknown as { [key: string]: string }
@@ -58,10 +61,8 @@ const SignUpPage: FC<ComponentProps> = () => {
 
       const { data: res } = await AuthService.register(formData)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
-      console.log(res)
-
-      router.push("/profile")
       toast.success(`Успех`)
+      await router.push("/profile/settings")
     } catch (error) {
       toast.error(`Ошибка`)
       console.log(error)
@@ -71,17 +72,17 @@ const SignUpPage: FC<ComponentProps> = () => {
   return (
     <>
       <div className="my-auto flex min-h-[calc(100vh-134px)] items-center justify-center px-4 py-4 sm:px-12">
-        <div className="loginform w-full max-w-[680px] flex-none rounded-2xl bg-white p-4 dark:bg-white/5 sm:p-10 lg:px-[146px] lg:py-[107px]">
+        <div className="loginform w-full max-w-[780px] flex-none rounded-2xl bg-white p-4 dark:bg-white/5 sm:p-10 lg:px-[146px] lg:py-[107px]">
           <h1 className="mb-2 text-center text-2xl font-semibold">Регистрация</h1>
           <div className="mb-7 flex items-center">
             <div className="h-[2px] w-full bg-black/10 dark:bg-white/10"></div>
             <div className="whitespace-nowrap px-5 text-black/40 dark:text-white/40">Описание</div>
             <div className="h-[2px] w-full bg-black/10 dark:bg-white/10"></div>
           </div>
+
           <form
             onSubmit={onSubmit}
             className="mb-4">
-
             <div className="mb-4">
               <input
                 {...register("lastname", { required: true })}
@@ -90,7 +91,7 @@ const SignUpPage: FC<ComponentProps> = () => {
                 className="form-input"
               />
             </div>
-            
+
             <div className="mb-4">
               <input
                 {...register("name", { required: true })}

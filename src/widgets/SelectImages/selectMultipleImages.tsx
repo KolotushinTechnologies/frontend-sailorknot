@@ -2,7 +2,12 @@ import { checkIsImage } from "@/src/shared/helpers/checkIsImage"
 import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
 import React, { useEffect, useRef } from "react"
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
 import { PhotoProvider, PhotoView } from "react-photo-view"
+
+interface ExtendedFile extends File {
+  documentName: string
+}
 interface ComponentProps {
   selectedImages: {
     file: File
@@ -28,8 +33,11 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
     const files = event.target.files
 
     if (files) {
+      let file = files[0] as ExtendedFile
+      file.documentName = name
+
       const updatedSelectedImages = {
-        file: files[0],
+        file: file,
         name: name,
       }
 
@@ -92,7 +100,7 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
   return (
     <PhotoProvider>
       <div
-        className={clsx("mb-6 selection:bg-transparent rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all", {
+        className={clsx("mb-6 rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all selection:bg-transparent", {
           "pointer-events-none hidden cursor-not-allowed opacity-10": !selectedSpecial,
           "pointer-events-auto block opacity-100": selectedSpecial,
         })}>
@@ -104,6 +112,7 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
 
               let link = ""
               let isImage = false
+
               if (matchFile) {
                 link = window.URL.createObjectURL(matchFile.file)
                 isImage = checkIsImage(matchFile.file)
@@ -116,10 +125,10 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
                     className="space-y-4">
                     <ul>
                       <li className="rounded-md bg-gray-200 p-2">
-                        <p>
-                          {index + 1}. {doc.name}
-                        </p>
+                        <span>{index + 1}. {doc.name}</span>
+                        {/* INPUT FILE PICKER */}
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
+
                         {isImage === false && matchFile ? (
                           <div className="flex h-40 w-full items-center justify-center rounded-md bg-gray-100">{matchFile.file.name}</div>
                         ) : isImage === true && matchFile ? (
@@ -136,6 +145,7 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
                 )
               } else {
                 return (
+                  // INNER LIST
                   <div
                     key={index}
                     className="mb-2 mt-4 rounded-md bg-gray-200 p-4 pl-4">
@@ -152,8 +162,11 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
                           link = window.URL.createObjectURL(matchFile.file)
                           isImage = checkIsImage(matchFile.file)
                         }
+
                         return (
-                          <li key={addIndex}>
+                          <li
+                            key={addIndex}
+                            className="rounded-md bg-gray-300 p-2">
                             <p>
                               {index + 1}.{addIndex + 1} {addDoc}
                             </p>

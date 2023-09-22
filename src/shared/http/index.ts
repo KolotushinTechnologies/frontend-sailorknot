@@ -14,6 +14,8 @@ http.interceptors.request.use(
     return config
   },
   (error) => {
+    console.log('error global');
+    
     return Promise.reject(error)
   },
 )

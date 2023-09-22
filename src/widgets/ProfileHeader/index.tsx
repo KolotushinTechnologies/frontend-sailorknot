@@ -1,10 +1,15 @@
+import { GetOneResponse } from "@/src/shared/http/services/userService/types/getOneById"
 import { ProfileStore } from "@/src/shared/store/profileStore"
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 
-const ProfileHeader = () => {
+interface ComponentProps {
+  profileData: GetOneResponse | null
+}
+
+const ProfileHeader:FC<ComponentProps> = ({profileData}) => {
   const { data: profile } = ProfileStore.useState((store) => store)
   const [isAdmin, isAdminSet] = useState(false)
   const pathname = usePathname()
@@ -39,7 +44,11 @@ const ProfileHeader = () => {
   }, [profile])
 
   return (
-    <div className="mb-5 grid grid-cols-1 items-center justify-between gap-4 md:grid-cols-3">
+    <div className={clsx("mb-5 grid grid-cols-1 items-center justify-between gap-4 md:grid-cols-3", {
+
+      "animate-pulse bg-white dark:bg-black pointer-events-none": !profileData,
+      "bg-white dark:bg-black": profileData,
+    })}>
       <div className="tabs-list table-responsive flex flex-nowrap space-x-2 overflow-auto text-sm md:col-span-2">
         {navs.map(({ label, value }) => {
           const parseValue = value.toLocaleLowerCase()

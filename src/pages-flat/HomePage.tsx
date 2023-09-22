@@ -12,6 +12,7 @@ import { useRouter } from "next/router"
 interface ComponentProps {}
 
 const HomePage: FC<ComponentProps> = () => {
+  const { data: profileData } = ProfileStore.useState((store) => store)
   const router = useRouter()
   const { data } = ProfileStore.useState((store) => store)
   const isSmall = useMedia("(max-width: 768px)", true)
@@ -41,6 +42,7 @@ const HomePage: FC<ComponentProps> = () => {
           hidden: !data,
         })}>
         <AppHeader
+          profileData={profileData}
           isSideBarActive={false}
           handler={toggleSideBarActiveHandler}
         />
@@ -69,7 +71,9 @@ const HomePage: FC<ComponentProps> = () => {
                 className="w-full rounded-lg border border-black bg-black px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
                 Профиль
               </Link>
-              <button onClick={logout} className="w-full rounded-lg border border-red-500 bg-red-500 px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-red-500 dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-red-500 dark:hover:bg-transparent dark:hover:text-white">
+              <button
+                onClick={logout}
+                className="w-full rounded-lg border border-red-500 bg-red-500 px-4 py-2 text-center text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-red-500 dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-red-500 dark:hover:bg-transparent dark:hover:text-white">
                 Выход
               </button>
             </>

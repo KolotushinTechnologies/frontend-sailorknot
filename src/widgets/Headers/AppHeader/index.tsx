@@ -3,13 +3,15 @@ import { FC } from "react"
 import clsx from "clsx"
 import { useRouter } from "next/router"
 import { ProfileStore } from "@/src/shared/store/profileStore"
+import { GetOneResponse } from "@/src/shared/http/services/userService/types/getOneById"
 
 interface ComponentProps {
   handler: () => void
   isSideBarActive: boolean
+  profileData: GetOneResponse | null
 }
 
-const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
+const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive, profileData }) => {
   const { data } = ProfileStore.useState((store) => store)
   const toggleSidebar = () => handler()
   const router = useRouter()
@@ -17,9 +19,9 @@ const AppHeader: FC<ComponentProps> = ({ handler, isSideBarActive }) => {
   return (
     <>
       <div
-        className={clsx("fixed right-0 top-0 z-[100] flex h-[75px] items-center justify-between border-b border-black/10 bg-white px-3 py-[22px] transition-all dark:border-white/10 md:px-7", {
+        className={clsx("group fixed right-0 top-0 z-[100] bg-white dark:bg-black flex h-[75px] items-center justify-between border-b border-black/10 px-3 py-[22px] transition-all dark:border-white/10 md:px-7", {
           "left-0 md:left-[212px]": isSideBarActive,
-          "left-0": !isSideBarActive,
+          "left-0": !isSideBarActive
         })}>
         <div className="flex items-center gap-2">
           <button

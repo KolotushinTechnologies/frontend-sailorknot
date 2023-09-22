@@ -31,7 +31,7 @@ const SignInPage: FC<ComponentProps> = () => {
 
   return (
     <div className="my-auto flex min-h-[calc(100vh-134px)] items-center justify-center px-4 py-4 sm:px-12">
-      <div className="loginform w-full max-w-[680px] flex-none rounded-2xl bg-white p-4 dark:bg-white/5 sm:p-10 lg:px-[146px] lg:py-[107px]">
+      <div className="loginform w-full max-w-[780px] flex-none rounded-2xl bg-white p-4 dark:bg-white/5 sm:p-10 lg:px-[146px] lg:py-[107px]">
         <h1 className="mb-2 text-center text-2xl font-semibold">Войти</h1>
         <div className="mb-7 flex items-center">
           <div className="h-[2px] w-full bg-black/10 dark:bg-white/10"></div>
