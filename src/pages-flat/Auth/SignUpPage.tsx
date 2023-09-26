@@ -1,9 +1,9 @@
 import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { documents } from "@/src/shared/documents"
 import { formatDate } from "@/src/shared/helpers/formatDate"
-import DocViewer, { DocViewerRenderers,  } from "@cyntler/react-doc-viewer";
 import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
+import { SelectFileProps } from "@/src/shared/types"
 import { DocumentProps } from "@/src/shared/types/document"
 import SelectMultipleImages from "@/src/widgets/SelectImages/selectMultipleImages"
 import Link from "next/link"
@@ -20,7 +20,7 @@ interface FormProps extends RegisterRequest {
 const SignUpPage: FC<ComponentProps> = () => {
   const router = useRouter()
 
-  const [selectedImages, setSelectedImages] = useState<{ file: File; name: string }[]>([])
+  const [selectedImages, setSelectedImages] = useState<SelectFileProps[]>([])
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
   const [selectedSpecialCount, selectedSpecialCountSet] = useState(0)
 
@@ -55,10 +55,13 @@ const SignUpPage: FC<ComponentProps> = () => {
 
       formData.set("speciality", selectedSpecial.title)
 
+      const parseSelectedImages: string[] = selectedImages.map(image=>image.name)
+      
+      formData.set("filenames", JSON.stringify(parseSelectedImages))
+      
       for (const file of parsedImages) {
         formData.append("documents", file)
       }
-
       const { data: res } = await AuthService.register(formData)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
       toast.success(`Успех`)

@@ -2,7 +2,7 @@ import { AuthService } from "../http/services/authService"
 import { NextRouter } from "next/router"
 import toast from "react-hot-toast"
 
-const useUpdateProfile = async (formData: FormData, router: NextRouter) => {
+const updateProfile = async (formData: FormData, router: NextRouter) => {
   try {
     const { data: res } = await AuthService.updateProfile(formData)
     console.log(res)
@@ -13,4 +13,4 @@ const useUpdateProfile = async (formData: FormData, router: NextRouter) => {
   }
 }
 
-export default useUpdateProfile
+export default updateProfile

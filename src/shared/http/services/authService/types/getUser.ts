@@ -10,7 +10,11 @@ export interface GetUserResponse {
     city: string
     balance: number
     roles: string[]
-    documents: string[]
+    documents: Array<{
+      name: string
+      link: string
+      _id: string
+    }>
     createdAt: string
     updatedAt: string
     __v: number

@@ -4,23 +4,15 @@ import clsx from "clsx"
 import React, { useEffect, useRef } from "react"
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
 import { PhotoProvider, PhotoView } from "react-photo-view"
+import { SelectFileProps } from "@/src/shared/types"
 
 interface ExtendedFile extends File {
   documentName: string
 }
 interface ComponentProps {
-  selectedImages: {
-    file: File
-    name: string
-  }[]
-  setSelectedImages: React.Dispatch<
-    React.SetStateAction<
-      {
-        file: File
-        name: string
-      }[]
-    >
-  >
+  selectedImages: SelectFileProps[]
+
+  setSelectedImages: React.Dispatch<React.SetStateAction<SelectFileProps[]>>
   selectedSpecial: DocumentProps | null
   selectedSpecialCount: number
   selectedSpecialCountSet: React.Dispatch<React.SetStateAction<number>>
@@ -36,9 +28,10 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
       let file = files[0] as ExtendedFile
       file.documentName = name
 
-      const updatedSelectedImages = {
+      const updatedSelectedImages: SelectFileProps = {
         file: file,
         name: name,
+        isNew: true,
       }
 
       const matchFile = selectedImages.find((filtered) => filtered.name === name)
@@ -97,6 +90,10 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
     }
   }, [selectedSpecial])
 
+  useEffect(()=>{
+    console.log('CHILD selectedImages: ', selectedImages);
+  }, [selectedImages])
+
   return (
     <PhotoProvider>
       <div
@@ -114,8 +111,13 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
               let isImage = false
 
               if (matchFile) {
-                link = window.URL.createObjectURL(matchFile.file)
-                isImage = checkIsImage(matchFile.file)
+                if (matchFile.url && matchFile.url.length > 0) {
+                  link = matchFile.url
+                  isImage = true
+                } else {
+                  link = window.URL.createObjectURL(matchFile.file)
+                  isImage = checkIsImage(matchFile.file)
+                }
               }
 
               if (!doc.additionDocuments) {
@@ -125,7 +127,9 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
                     className="space-y-4">
                     <ul>
                       <li className="rounded-md bg-gray-200 p-2">
-                        <span>{index + 1}. {doc.name}</span>
+                        <span>
+                          {index + 1}. {doc.name}
+                        </span>
                         {/* INPUT FILE PICKER */}
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
 
@@ -158,9 +162,15 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
 
                         let link = ""
                         let isImage = false
+
                         if (matchFile) {
-                          link = window.URL.createObjectURL(matchFile.file)
-                          isImage = checkIsImage(matchFile.file)
+                          if (matchFile.url && matchFile.url.length > 0) {
+                            link = matchFile.url
+                            isImage = true
+                          } else {
+                            link = window.URL.createObjectURL(matchFile.file)
+                            isImage = checkIsImage(matchFile.file)
+                          }
                         }
 
                         return (

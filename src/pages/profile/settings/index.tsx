@@ -10,7 +10,8 @@ import { NextPageWithLayout } from "../../_app"
 import { SiteLayout } from "@/src/widgets/Layouts/SiteLayout"
 import ProfileLayout from "@/src/widgets/Layouts/ProfileLayout"
 import { ProfileStore } from "@/src/shared/store/profileStore"
-import useUpdateProfile from "@/src/shared/hooks/useUpdateProfile"
+import updateProfile from "@/src/shared/helpers/updateProfile"
+import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 
 interface PageProps {}
 interface FormProps extends RegisterRequest {
@@ -21,7 +22,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
   const router = useRouter()
 
   const { data: profileData } = ProfileStore.useState((store) => store)
-  const [selectedImages, setSelectedImages] = useState<{ file: File; name: string }[]>([])
+  const [selectedImages, setSelectedImages] = useState<SelectFileProps[]>([])
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
   const [selectedSpecialCount, selectedSpecialCountSet] = useState(0)
 
@@ -41,6 +42,30 @@ const Page: NextPageWithLayout<PageProps> = () => {
     }
   }
 
+  const parseImages = async ({ data }: { data: ProfileProps }) => {
+    if (!data || !data.data) return null
+    if (data.data.documents.length > 0) {
+      const files: SelectFileProps[] = []
+
+      const promises = data.data.documents.map(async (image) => {
+        const response = await fetch(image.link)
+        const blob = await response.blob()
+        const file = new File([blob], image.name)
+
+        const preparedFile: SelectFileProps = {
+          file,
+          isNew: false,
+          name: image.name,
+          url: image.link,
+        }
+        files.push(preparedFile)
+      })
+
+      await Promise.all(promises)
+      setSelectedImages(files)
+    }
+  }
+
   const onSubmit = handleSubmit(async (data, event) => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
@@ -57,13 +82,13 @@ const Page: NextPageWithLayout<PageProps> = () => {
         formData.set("speciality", selectedSpecial.title)
         formData.set("statusChangeFile", "false")
 
-        useUpdateProfile(formData, router)
+        updateProfile(formData, router)
       }
 
       // Если специализация такая же, но загружены новые изображения
       // Отправляем базовые поля + statusChangeFile = true + documentAttachments
       if (profileData && profileData.speciality === selectedSpecial.title && selectedImages.length > 0) {
-        if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
+        // if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
 
         const formData = new FormData()
         for (const key in rest) {
@@ -78,7 +103,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           formData.append("documents", file)
         }
 
-        useUpdateProfile(formData, router)
+        updateProfile(formData, router)
       }
 
       // Если специализация другая
@@ -99,7 +124,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           formData.append("documents", file)
         }
 
-        useUpdateProfile(formData, router)
+        updateProfile(formData, router)
       }
     } catch (error) {
       toast.error(`Ошибка`)
@@ -125,6 +150,9 @@ const Page: NextPageWithLayout<PageProps> = () => {
         if (selectRef.current) {
           selectRef.current.value = matchSpecial.title
         }
+      }
+      if (selectedImages.length === 0) {
+        parseImages({ data: { data: profileData } })
       }
     }
   }, [profileData])

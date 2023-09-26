@@ -1,5 +1,6 @@
 import { Store, registerInDevtools } from "pullstate"
 import { GetUserResponse } from "../http/services/authService/types/getUser"
+import { ProfileProps } from "../types"
 
 /**
  * У вас есть интерфейс GetUserResponse, который представляет структуру объекта с данными о пользователе. Вы хотите создать новый интерфейс, который будет расширять GetUserResponse, но позволит свойству data быть каким-то значением или null.
@@ -10,15 +11,13 @@ import { GetUserResponse } from "../http/services/authService/types/getUser"
   Мы используем маппированный тип для этого. Мы перебираем ключи K из GetUserResponse и проверяем каждый ключ: если ключ равен "data", то мы разрешаем свойству data быть или GetUserResponse["data"], или null. Для всех остальных ключей мы сохраняем тот же тип, что и в GetUserResponse.
   Таким образом, этот подход позволяет сделать свойство data nullable, сохраняя при этом типы всех остальных свойств такими же, как в исходном интерфейсе.
  */
-export type ProfileStoreProps = {
-  [K in keyof GetUserResponse]: K extends "data" ? GetUserResponse["data"] | null : GetUserResponse[K]
-}
 
-export const ProfileStore = new Store<ProfileStoreProps>({
+
+export const ProfileStore = new Store<ProfileProps>({
   data: null,
 })
 
-export const profileStoreGetUser = (data: ProfileStoreProps) => {
+export const profileStoreGetUser = (data: ProfileProps) => {
   ProfileStore.update((store) => {
     store.data = data.data
   })

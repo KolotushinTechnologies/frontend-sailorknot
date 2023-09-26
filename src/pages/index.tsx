@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactElement, useEffect } from "react"
 import { NextPageWithLayout } from "./_app"
 import { SiteLayout } from "../widgets/Layouts/SiteLayout"
 import HomePage from "../pages-flat/HomePage"

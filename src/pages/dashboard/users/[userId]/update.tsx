@@ -15,7 +15,7 @@ interface ParamProps extends ParsedUrlQuery {
 }
 
 const Page: NextPageWithLayout<PageProps> = ({ userId }) => {
-  return <DashboardUpsertUser title={`Редактировать пользователя ${userId}`} />
+  return <DashboardUpsertUser />
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async ({ query, params }) => {
