@@ -10,6 +10,7 @@ interface ExtendedFile extends File {
   documentName: string
 }
 interface ComponentProps {
+  disabled?: boolean
   selectedImages: SelectFileProps[]
 
   setSelectedImages: React.Dispatch<React.SetStateAction<SelectFileProps[]>>
@@ -18,7 +19,7 @@ interface ComponentProps {
   selectedSpecialCountSet: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
+const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   const handleFileInputChange = (index: number, name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +63,13 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
         />
         <div className="grid space-y-2">
           <button
-            className="dark:blue-500 text-md w-full rounded-lg border border-blue-500 bg-blue-500 p-2 font-medium text-white transition-all duration-300 hover:bg-transparent hover:text-blue-500 dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:hover:bg-transparent dark:hover:text-white"
+            disabled={disabled}
+            className={clsx(
+              "dark:blue-500 text-md w-full rounded-lg border border-blue-500 bg-blue-500 p-2 font-medium text-white transition-all duration-300 hover:bg-transparent hover:text-blue-500 dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:hover:bg-transparent dark:hover:text-white",
+              {
+                "pointer-events-none": disabled,
+              },
+            )}
             type="button"
             onClick={handleSelectFileButtonClick(index, name)}>
             Выбрать изображение

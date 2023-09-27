@@ -12,6 +12,8 @@ import { ChangeEvent, FC, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { UpdateUserBody } from "@/src/shared/http/services/userService/types/updateOne"
+import { ProfileProps, SelectFileProps } from "@/src/shared/types"
+import SelectMultipleImages from "../../SelectImages/selectMultipleImages"
 
 interface ComponentProps {}
 
@@ -20,8 +22,10 @@ interface FormProps extends CreateOneBody {}
 export const DashboardUpsertUser: FC<ComponentProps> = () => {
   const router = useRouter()
 
+  const [selectedImages, setSelectedImages] = useState<SelectFileProps[]>([])
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
+  const [selectedSpecialCount, selectedSpecialCountSet] = useState(0)
 
   const ref = useRef(null)
   const inputRef = useRef(null)
@@ -46,6 +50,30 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       store.modalStoreCancel = async () => console.log("Удалить нет")
     })
     modalStoreToggle(true)
+  }
+
+  const parseImages = async ({ data }: { data: ProfileProps }) => {
+    if (!data || !data.data) return null
+    if (data.data.documents.length > 0) {
+      const files: SelectFileProps[] = []
+
+      const promises = data.data.documents.map(async (image) => {
+        const response = await fetch(image.link)
+        const blob = await response.blob()
+        const file = new File([blob], image.name)
+
+        const preparedFile: SelectFileProps = {
+          file,
+          isNew: false,
+          name: image.name,
+          url: image.link,
+        }
+        files.push(preparedFile)
+      })
+
+      await Promise.all(promises)
+      setSelectedImages(files)
+    }
   }
 
   const {
@@ -133,6 +161,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
         if (selectRef.current) {
           selectRef.current.value = matchSpecial.title
         }
+      }
+
+      if (selectedImages.length === 0) {
+        parseImages({ data: { data: user } })
       }
     }
   }, [user])
@@ -286,6 +318,15 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
                 <SpetialOptions />
               </select>
             </div>
+
+            <SelectMultipleImages
+              disabled={true}
+              selectedImages={selectedImages}
+              setSelectedImages={setSelectedImages}
+              selectedSpecial={selectedSpecial}
+              selectedSpecialCount={selectedSpecialCount}
+              selectedSpecialCountSet={selectedSpecialCountSet}
+            />
           </div>
         </div>
       </div>
