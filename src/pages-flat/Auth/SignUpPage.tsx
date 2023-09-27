@@ -1,6 +1,6 @@
 import { AVAILABLE_LS_KEYS } from "@/src/shared/constants"
 import { documents } from "@/src/shared/documents"
-import { formatDate } from "@/src/shared/helpers/formatDate"
+import { IMaskInput } from "react-imask"
 import { AuthService } from "@/src/shared/http/services/authService"
 import { RegisterRequest } from "@/src/shared/http/services/authService/types/register"
 import { SelectFileProps } from "@/src/shared/types"
@@ -8,7 +8,7 @@ import { DocumentProps } from "@/src/shared/types/document"
 import SelectMultipleImages from "@/src/widgets/SelectImages/selectMultipleImages"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { FC, useState } from "react"
+import React, { FC, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 
@@ -24,6 +24,9 @@ const SignUpPage: FC<ComponentProps> = () => {
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
   const [selectedSpecialCount, selectedSpecialCountSet] = useState(0)
 
+  const ref = useRef(null)
+  const inputRef = useRef(null)
+
   const onSelectSpecial = (item: string) => {
     const matchItem = documents.find((filteredItem) => filteredItem.title === item)
     if (matchItem) {
@@ -34,18 +37,18 @@ const SignUpPage: FC<ComponentProps> = () => {
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue: formSetValue,
     formState: { errors },
   } = useForm<FormProps>()
 
   const onSubmit = handleSubmit(async (data, event) => {
+    
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
 
-    // TODO: Не обязательно
-    // if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
-
     try {
-      const { confirmPassword, ...rest } = data as unknown as { [key: string]: string }
+      const { confirmPassword, phoneNumber, ...rest } = data as unknown as { [key: string]: string }
       const parsedImages: File[] = selectedImages.map((image) => image.file)
 
       const formData = new FormData()
@@ -54,11 +57,12 @@ const SignUpPage: FC<ComponentProps> = () => {
       }
 
       formData.set("speciality", selectedSpecial.title)
+      formData.set("phoneNumber", `+${phoneNumber}`)
 
-      const parseSelectedImages: string[] = selectedImages.map(image=>image.name)
-      
+      const parseSelectedImages: string[] = selectedImages.map((image) => image.name)
+
       formData.set("filenames", JSON.stringify(parseSelectedImages))
-      
+
       for (const file of parsedImages) {
         formData.append("documents", file)
       }
@@ -123,12 +127,17 @@ const SignUpPage: FC<ComponentProps> = () => {
             </div>
 
             <div className="mb-4">
-              <input
-                autoComplete="off"
-                {...register("phoneNumber", { required: true })}
-                type="text"
-                placeholder="Номер телефона"
+              <IMaskInput
+                mask={"+{7}(000)000-00-00"}
+                radix="."
                 className="form-input"
+                value={getValues("phoneNumber")}
+                unmask={true}
+                ref={ref}
+                onFocus={undefined}
+                inputRef={inputRef}
+                onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+                placeholder="Номер телефона"
               />
             </div>
 
@@ -143,7 +152,7 @@ const SignUpPage: FC<ComponentProps> = () => {
 
               <button
                 type="submit"
-                className="absolute right-3 top-3 text-black/20 hover:text-black dark:text-white/20 dark:hover:text-white">
+                className="absolute right-3 top-3 hidden text-black/20 hover:text-black dark:text-white/20 dark:hover:text-white">
                 {/* TODO: Add icon */}
                 {/* <svg
                   width="16"
@@ -166,7 +175,7 @@ const SignUpPage: FC<ComponentProps> = () => {
               </button>
             </div>
 
-            <div className="mb-3 flex gap-2">
+            <div className="mb-3 hidden gap-2">
               <div className="h-1 w-full bg-black/10 dark:bg-white/10"></div>
               <div className="h-1 w-full bg-black/10 dark:bg-white/10"></div>
               <div className="h-1 w-full bg-black/10 dark:bg-white/10"></div>

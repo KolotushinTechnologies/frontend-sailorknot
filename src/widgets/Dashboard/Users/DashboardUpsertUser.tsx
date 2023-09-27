@@ -5,12 +5,13 @@ import { CreateOneBody } from "@/src/shared/http/services/userService/types/crea
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
 import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
-
+import { IMaskInput } from "react-imask"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChangeEvent, FC, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
+import { UpdateUserBody } from "@/src/shared/http/services/userService/types/updateOne"
 
 interface ComponentProps {}
 
@@ -21,6 +22,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
 
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
+
+  const ref = useRef(null)
+  const inputRef = useRef(null)
+
   const selectRef = useRef<HTMLSelectElement>(null)
 
   const onDeleteHandler = () => {
@@ -47,6 +52,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
     register,
     setValue: formSetValue,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormProps>()
 
@@ -74,7 +80,12 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
     if (!selectedSpecial) return toast.error(`Выбирете должность`)
 
     if (!user) {
-      const parseData = { ...data, speciality: selectedSpecial.title }
+      const { speciality, phoneNumber, ...rest } = data
+      const parseData: CreateOneBody = {
+        ...rest,
+        speciality: selectedSpecial.title,
+        phoneNumber: `+${phoneNumber}`,
+      }
 
       try {
         const { data: createdUser } = await UserService.createOne(parseData)
@@ -87,8 +98,12 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
     }
 
     if (user) {
-      const { comment, password, ...restInfo } = data
-      const parseData = { ...restInfo, speciality: selectedSpecial.title }
+      const { comment, password, phoneNumber, ...restInfo } = data
+      const parseData: UpdateUserBody = {
+        ...restInfo,
+        speciality: selectedSpecial.title,
+        phoneNumber: `+${phoneNumber}`,
+      }
 
       try {
         const { data: createdUser } = await UserService.updateUser({ user_id: user._id }, parseData)
@@ -108,7 +123,6 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       formSetValue("lastname", lastname)
       formSetValue("surname", surname)
       formSetValue("dateBirth", dateBirth)
-      formSetValue("phoneNumber", phoneNumber)
       formSetValue("city", city)
 
       const matchSpecial = documents.find((document) => document.title === speciality)
@@ -202,12 +216,17 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Телефон</label>
-              <input
-                {...register("phoneNumber", { required: true })}
-                type="text"
-                defaultValue={user ? user.phoneNumber : ""}
-                placeholder="Телефон"
+              <IMaskInput
+                mask={"+{7}(000)000-00-00"}
+                radix="."
                 className="form-input"
+                value={user ? `${user.phoneNumber.slice(1)}` : getValues("phoneNumber")}
+                unmask={true}
+                ref={ref}
+                onFocus={undefined}
+                inputRef={inputRef} // access to nested input
+                onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+                placeholder="Номер телефона"
               />
             </div>
 

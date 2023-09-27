@@ -3,23 +3,31 @@ import { AuthService } from "@/src/shared/http/services/authService"
 import { LoginRequest } from "@/src/shared/http/services/authService/types/login"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { FC } from "react"
+import React, { FC, useRef } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
+import { IMaskInput } from "react-imask"
 
 interface ComponentProps {}
 
 const SignInPage: FC<ComponentProps> = () => {
   const router = useRouter()
 
+  const ref = useRef(null)
+  const inputRef = useRef(null)
+
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue: formSetValue,
     formState: { errors },
   } = useForm<LoginRequest>()
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const { data: res } = await AuthService.login(data)
+      const { phoneNumber, ...rest } = data
+      const parseData = { ...rest, phoneNumber: `+${phoneNumber}` }
+      const { data: res } = await AuthService.login(parseData)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
       toast.success(`Успех`)
       router.push("/profile")
@@ -42,14 +50,20 @@ const SignInPage: FC<ComponentProps> = () => {
           onSubmit={onSubmit}
           className="mb-4">
           <div className="mb-4">
-            <input
-              autoComplete="off"
-              {...register("phoneNumber", { required: true })}
-              type="text"
-              placeholder="Телефон"
+            <IMaskInput
+              autoComplete="true"
+              mask={"+{7}(000)000-00-00"}
+              radix="."
               className="form-input"
+              unmask={true}
+              ref={ref}
+              onFocus={undefined}
+              inputRef={inputRef}
+              onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+              placeholder="Номер телефона"
             />
           </div>
+
           <div className="mb-2">
             <input
               autoComplete="off"

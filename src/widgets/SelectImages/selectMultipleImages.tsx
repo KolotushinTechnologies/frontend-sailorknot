@@ -90,10 +90,6 @@ const SelectMultipleImages = ({ selectedSpecial, selectedImages, setSelectedImag
     }
   }, [selectedSpecial])
 
-  useEffect(()=>{
-    console.log('CHILD selectedImages: ', selectedImages);
-  }, [selectedImages])
-
   return (
     <PhotoProvider>
       <div
