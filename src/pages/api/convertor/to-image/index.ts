@@ -1,57 +1,66 @@
-import fs from "fs"
-import path from "path"
-import pdf2image from "pdf2image"
-import imageToBase64 from "image-to-base64"
-import * as mammoth from "mammoth"
-import * as htmlToImage from "html-to-image"
-import type { NextApiRequest, NextApiResponse } from "next"
-import formidable from "formidable"
+import { NextApiRequest, NextApiResponse } from "next"
+import multer from "multer"
+const path = require("path")
+const upload = multer({ dest: "uploads/", limits: {
+  fileSize: 1000000000
+}  }) // Define the upload directory
 
-type ResponseData = {
-  message: string
+const options = {
+  density: 100,
+  saveFilename: "untitled",
+  savePath: "./images",
+  format: "png",
+  width: 600,
+  height: 600,
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
-  const requestMethod = req.method
-  switch (requestMethod) {
-    case "POST":
-      return res.status(200).json({ message: "Ok" })
+export const config = {
+  api: {
+    bodyParser: false, // Disable the default bodyParser
+  },
+};
 
-      // try {
-      //   const form = new formidable.IncomingForm({
-      //       uploadDir: "./public/uploads"
-      //   })
 
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === "POST") {
+    return res.status(200).json({ msg: "Ok" })
+
+    // Use the 'upload' middleware to handle the file upload
+    // upload.single("file")(req, res, (err: any) => {
+    //   if (err instanceof multer.MulterError) {
+    //     // Handle any multer errors here
+    //     return res.status(500).json({ error: "File upload error" })
+    //   } else if (err) {
+    //     return res.status(500).json({ error: "Internal server error" })
+    //   }
+
+    //   // The file should be available in 'req.file'
+    //   const file:File = req.file
+
+    //   try {
+    //     const fileBuffer = Buffer.from(file, 'base64')
+    //     console.log(fileBuffer);
         
-      //   return res.status(200).json({ message: "Ok" })
+    //   } catch (error) {
+    //     console.log(error);
+        
+    //     return res.status(400).json({ error: "Error" })
+    //   }
 
-      //   form.parse(req, async (err, fields, files) => {
-      //     if (err) {
-      //       console.error(err)
-      //       return res.status(500).json({ message: "File upload failed." })
-      //     }
+    //   if (!file) {
+    //     return res.status(400).json({ error: "No file uploaded" })
+    //   }
 
-      //     const file = files.upload
+    //   // You can access file properties like 'originalname' and 'path'
+    //   const { originalname, path } = file
 
-      //     if (!file) {
-      //       return res.status(400).json({ message: "No file uploaded." })
-      //     }
+    //   // Process the file as needed
+    //   // For example, you can move it to a different location, read its contents, etc.
 
-      //     // Generate a unique file name or use the original file name
-      //     const fileName = Date.now() + path.extname(file.name)
-
-      //     // Move the uploaded file to the desired location
-      //     const newPath = path.join(form.uploadDir, fileName)
-      //     fs.renameSync(file.path, newPath)
-
-      //     return res.status(200).json({ success: "File uploaded successfully." })
-      //   })
-      // } catch (error) {
-      //   console.error(error)
-      //   return res.status(500).json({ message: "File upload failed." })
-      // }
-    //   res.status(200).json({ message: `You submitted the following data` })
-    default:
-      res.status(200).json({ message: "Welcome to API Routes!" })
+    //   // Send a response
+    //   res.status(200).json({ message: "File uploaded successfully" })
+    // })
+  } else {
+    res.status(405).end() // Method not allowed
   }
 }

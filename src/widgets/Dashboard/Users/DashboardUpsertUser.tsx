@@ -58,17 +58,19 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       const files: SelectFileProps[] = []
 
       const promises = data.data.documents.map(async (image) => {
-        const response = await fetch(image.link)
-        const blob = await response.blob()
-        const file = new File([blob], image.name)
+        try {
+          const response = await fetch(image.link)
+          const blob = await response.blob()
+          const file = new File([blob], image.name)
 
-        const preparedFile: SelectFileProps = {
-          file,
-          isNew: false,
-          name: image.name,
-          url: image.link,
-        }
-        files.push(preparedFile)
+          const preparedFile: SelectFileProps = {
+            file,
+            isNew: false,
+            name: image.name,
+            url: image.link,
+          }
+          files.push(preparedFile)
+        } catch (error) {}
       })
 
       await Promise.all(promises)
@@ -315,7 +317,24 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
                 onChange={(e) => onSelectSpecial(e.target.value)}
                 className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <option>Выбирете должность</option>
-                <SpetialOptions />
+                {!user || (user && user.speciality.toLowerCase().includes("агент")) ? (
+                  <option
+                    key={documents[0].title}
+                    value={`${documents[0].title}`}>
+                    {documents[0].title}
+                  </option>
+                ) : user && !user.speciality.toLowerCase().includes("агент") ? (
+                  documents.slice(1).map((item) => {
+                    const { title, documents } = item
+                    return (
+                      <option
+                        key={item.title}
+                        value={`${title}`}>
+                        {title}
+                      </option>
+                    )
+                  })
+                ) : null}
               </select>
             </div>
 

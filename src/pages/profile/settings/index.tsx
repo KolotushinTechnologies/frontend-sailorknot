@@ -13,6 +13,7 @@ import ProfileLayout from "@/src/widgets/Layouts/ProfileLayout"
 import { ProfileStore } from "@/src/shared/store/profileStore"
 import updateProfile from "@/src/shared/helpers/updateProfile"
 import { ProfileProps, SelectFileProps } from "@/src/shared/types"
+import clsx from "clsx"
 
 interface PageProps {}
 interface FormProps extends RegisterRequest {
@@ -54,17 +55,19 @@ const Page: NextPageWithLayout<PageProps> = () => {
       const files: SelectFileProps[] = []
 
       const promises = data.data.documents.map(async (image) => {
-        const response = await fetch(image.link)
-        const blob = await response.blob()
-        const file = new File([blob], image.name)
+        try {
+          const response = await fetch(image.link)
+          const blob = await response.blob()
+          const file = new File([blob], image.name)
 
-        const preparedFile: SelectFileProps = {
-          file,
-          isNew: false,
-          name: image.name,
-          url: image.link,
-        }
-        files.push(preparedFile)
+          const preparedFile: SelectFileProps = {
+            file,
+            isNew: false,
+            name: image.name,
+            url: image.link,
+          }
+          files.push(preparedFile)
+        } catch (error) {}
       })
 
       await Promise.all(promises)
@@ -231,21 +234,6 @@ const Page: NextPageWithLayout<PageProps> = () => {
             />
           </div>
 
-          {/* <Controller
-            control={control}
-            name="phoneNumber"
-            defaultValue={""}
-            render={({ field }) => (
-              <input
-                {...field}
-                value={field.value}
-                type="text"
-                placeholder="Номер телефона"
-                className="form-input"
-              />
-            )}
-          /> */}
-
           <div className="mb-4">
             <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Город присутствия</label>
             <input
@@ -256,7 +244,10 @@ const Page: NextPageWithLayout<PageProps> = () => {
             />
           </div>
 
-          <div className="mb-4">
+          <div
+            className={clsx("mb-4", {
+              hidden: profileData && profileData.speciality.toLocaleLowerCase().includes("агент"),
+            })}>
             <label
               htmlFor="spec"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
@@ -281,13 +272,15 @@ const Page: NextPageWithLayout<PageProps> = () => {
             </select>
           </div>
 
-          <SelectMultipleImages
-            selectedImages={selectedImages}
-            setSelectedImages={setSelectedImages}
-            selectedSpecial={selectedSpecial}
-            selectedSpecialCount={selectedSpecialCount}
-            selectedSpecialCountSet={selectedSpecialCountSet}
-          />
+          {profileData && profileData.speciality.toLocaleLowerCase().includes("агент") ? null : (
+            <SelectMultipleImages
+              selectedImages={selectedImages}
+              setSelectedImages={setSelectedImages}
+              selectedSpecial={selectedSpecial}
+              selectedSpecialCount={selectedSpecialCount}
+              selectedSpecialCountSet={selectedSpecialCountSet}
+            />
+          )}
 
           <button
             type="submit"

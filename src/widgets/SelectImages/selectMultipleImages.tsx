@@ -2,9 +2,10 @@ import { checkIsImage } from "@/src/shared/helpers/checkIsImage"
 import { DocumentProps } from "@/src/shared/types/document"
 import clsx from "clsx"
 import React, { useEffect, useRef } from "react"
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer"
 import { PhotoProvider, PhotoView } from "react-photo-view"
 import { SelectFileProps } from "@/src/shared/types"
+import { FileConvertService } from "@/src/shared/http/services/fileConvertService"
+import Link from "next/link"
 
 interface ExtendedFile extends File {
   documentName: string
@@ -22,12 +23,21 @@ interface ComponentProps {
 const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([])
 
-  const handleFileInputChange = (index: number, name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (index: number, name: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
 
     if (files) {
       let file = files[0] as ExtendedFile
       file.documentName = name
+
+      // try {
+      //   const formData = new FormData()
+      //   formData.set("file", file)
+      //   const uploadedFile = await FileConvertService.getImage(formData)
+      //   console.log(uploadedFile)
+      // } catch (error) {
+      //   console.log(error)
+      // }
 
       const updatedSelectedImages: SelectFileProps = {
         file: file,
@@ -67,7 +77,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
             className={clsx(
               "dark:blue-500 text-md w-full rounded-lg border border-blue-500 bg-blue-500 p-2 font-medium text-white transition-all duration-300 hover:bg-transparent hover:text-blue-500 dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:hover:bg-transparent dark:hover:text-white",
               {
-                "pointer-events-none": disabled,
+                "cursor-not-allowed": disabled,
               },
             )}
             type="button"
@@ -114,7 +124,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
               let isImage = false
 
               if (matchFile) {
-                if (matchFile.url && matchFile.url.length > 0) {
+                if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
                   link = matchFile.url
                   isImage = true
                 } else {
@@ -137,7 +147,17 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
 
                         {isImage === false && matchFile ? (
-                          <div className="flex h-40 w-full items-center justify-center rounded-md bg-gray-100">{matchFile.file.name}</div>
+                          <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
+                            <p>Документ {matchFile.file.name}</p>
+                            {matchFile.isNew ? null : (
+                              <Link
+                                target="_blank"
+                                href={`${matchFile.url}`}
+                                className="rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400">
+                                Открыть / Скачать
+                              </Link>
+                            )}
+                          </div>
                         ) : isImage === true && matchFile ? (
                           <PhotoView src={link}>
                             <img
@@ -167,7 +187,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                         let isImage = false
 
                         if (matchFile) {
-                          if (matchFile.url && matchFile.url.length > 0) {
+                          if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
                             link = matchFile.url
                             isImage = true
                           } else {
@@ -185,7 +205,17 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                             </p>
                             {renderFileInput(index + addIndex, addDoc)}
                             {isImage === false && matchFile ? (
-                              <div className="flex h-40 w-full items-center justify-center rounded-md bg-gray-100">{matchFile.file.name}</div>
+                              <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
+                                <p>Документ {matchFile.file.name}</p>
+                                {matchFile.isNew ? null : (
+                                  <Link
+                                    target="_blank"
+                                    href={`${matchFile.url}`}
+                                    className="rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400">
+                                    Открыть / Скачать
+                                  </Link>
+                                )}
+                              </div>
                             ) : isImage === true && matchFile ? (
                               <PhotoView src={link}>
                                 <img
