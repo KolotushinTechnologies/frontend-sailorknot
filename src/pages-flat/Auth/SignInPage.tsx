@@ -26,7 +26,7 @@ const SignInPage: FC<ComponentProps> = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       const { phoneNumber, ...rest } = data
-      const parseData = { ...rest, phoneNumber: `+${phoneNumber}` }
+      const parseData = { ...rest, phoneNumber: `+7${phoneNumber}` }
       const { data: res } = await AuthService.login(parseData)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
       toast.success(`Успех`)
@@ -49,7 +49,7 @@ const SignInPage: FC<ComponentProps> = () => {
         <form
           onSubmit={onSubmit}
           className="mb-4">
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <IMaskInput
               autoComplete="true"
               mask={"+{7}(000)000-00-00"}
@@ -62,6 +62,26 @@ const SignInPage: FC<ComponentProps> = () => {
               onAccept={(value, mask) => formSetValue("phoneNumber", value)}
               placeholder="Номер телефона"
             />
+          </div> */}
+
+          <div className="mb-4">
+            <div className="flex h-[46px]">
+              <span className="flex h-full items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400">
+                +7
+              </span>
+              <IMaskInput
+                mask={"(000)000-00-00"}
+                radix="."
+                className="block h-full w-full min-w-0 flex-1 rounded-none rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                {...register("phoneNumber", { required: true })}
+                unmask={true}
+                ref={ref}
+                onFocus={undefined}
+                inputRef={inputRef}
+                onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+                placeholder="Введите номер телефона без 8 или +7"
+              />
+            </div>
           </div>
 
           <div className="mb-2">
