@@ -2,7 +2,8 @@ import axios from "axios"
 import { AVAILABLE_LS_KEYS } from "../constants"
 
 const http = axios.create({
-  baseURL: "http://213.189.201.213:8000",
+  baseURL: process.env.NODE_ENV === "development" ? "http://213.189.201.213:8000" : "https://monoframe.ru",
+  withCredentials: process.env.NODE_ENV === "development" ? false : true,
 })
 
 http.interceptors.request.use(

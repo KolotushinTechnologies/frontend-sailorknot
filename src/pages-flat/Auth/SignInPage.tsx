@@ -3,7 +3,7 @@ import { AuthService } from "@/src/shared/http/services/authService"
 import { LoginRequest } from "@/src/shared/http/services/authService/types/login"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import React, { FC, useRef } from "react"
+import React, { FC, useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { IMaskInput } from "react-imask"
@@ -36,6 +36,16 @@ const SignInPage: FC<ComponentProps> = () => {
       console.log(error)
     }
   })
+
+  // TODO: Сделать проверку и вставку
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     setInterval(() => {
+  //       const inputPhone = document.getElementById("userPhone") as HTMLInputElement
+  //       console.log(inputPhone.value)
+  //     }, 500)
+  //   }
+  // }, [])
 
   return (
     <div className="my-auto flex min-h-[calc(100vh-134px)] items-center justify-center px-4 py-4 sm:px-12">
@@ -70,6 +80,7 @@ const SignInPage: FC<ComponentProps> = () => {
                 +7
               </span>
               <IMaskInput
+                id="userPhone"
                 mask={"(000)000-00-00"}
                 radix="."
                 className="block h-full w-full min-w-0 flex-1 rounded-none rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"

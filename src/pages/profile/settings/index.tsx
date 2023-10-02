@@ -78,12 +78,17 @@ const Page: NextPageWithLayout<PageProps> = () => {
   const onSubmit = handleSubmit(async (data, event) => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
-    try {
-      const { password, confirmPassword, speciality, phoneNumber, ...rest } = data
+    const { password, confirmPassword, speciality, phoneNumber, balance, ...rest } = data
 
-      // Если специализация такая же и не загружены новые изображения
-      // Отправляем базовые поля + statusChangeFile = false
-      if (profileData && profileData.speciality === selectedSpecial.title && selectedImages.length === 0) {
+    // Оставить все как есть
+    if (
+      selectedImages.every((search) => search.isNew === false) &&
+      profileData &&
+      profileData.documents.length === selectedImages.length &&
+      profileData &&
+      profileData.speciality === selectedSpecial.title
+    ) {
+      try {
         const formData = new FormData()
         for (const key in rest) {
           // @ts-ignore
@@ -91,58 +96,170 @@ const Page: NextPageWithLayout<PageProps> = () => {
         }
         formData.set("speciality", selectedSpecial.title)
         formData.set("phoneNumber", `+${phoneNumber}`)
-        formData.set("statusChangeFile", "false")
 
-        updateProfile(formData, router)
+        formData.set("documents", JSON.stringify([]))
+        formData.set("filenames", JSON.stringify([]))
+
+        await updateProfile(formData, router)
+      } catch (error) {
+      } finally {
+        router.push(
+          router.asPath,
+          {
+            query: {},
+          },
+          {
+            scroll: false,
+          },
+        )
       }
-
-      // Если специализация такая же, но загружены новые изображения
-      // Отправляем базовые поля + statusChangeFile = true + documentAttachments
-      if (profileData && profileData.speciality === selectedSpecial.title && selectedImages.length > 0) {
-        // if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
-
-        const formData = new FormData()
-        for (const key in rest) {
-          // @ts-ignore
-          formData.set(key, rest[key])
-        }
-        formData.set("speciality", selectedSpecial.title)
-        formData.set("phoneNumber", `+${phoneNumber}`)
-        formData.set("statusChangeFile", "true")
-        const parsedImages: File[] = selectedImages.map((image) => image.file)
-
-        for (const file of parsedImages) {
-          formData.append("documents", file)
-        }
-
-        updateProfile(formData, router)
-      }
-
-      // Если специализация другая
-      // Отправляем базовые поля + обновленная специализация + statusChangeFile = true + documentAttachments
-      if (profileData && profileData.speciality !== selectedSpecial.title) {
-        if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
-
-        const formData = new FormData()
-        for (const key in rest) {
-          // @ts-ignore
-          formData.set(key, rest[key])
-        }
-        formData.set("speciality", selectedSpecial.title)
-
-        formData.set("statusChangeFile", "true")
-        const parsedImages: File[] = selectedImages.map((image) => image.file)
-
-        for (const file of parsedImages) {
-          formData.append("documents", file)
-        }
-
-        updateProfile(formData, router)
-      }
-    } catch (error) {
-      toast.error(`Ошибка`)
-      console.log(error)
+      return
     }
+
+    // Удалить все документы
+    if (selectedImages.length === 0 && profileData && profileData.documents.length > 0) {
+      try {
+        const formData = new FormData()
+        for (const key in rest) {
+          // @ts-ignore
+          formData.set(key, rest[key])
+        }
+        formData.set("speciality", selectedSpecial.title)
+        formData.set("phoneNumber", `+${phoneNumber}`)
+
+        formData.set("statusChangeFile", "false")
+        formData.set("documents", JSON.stringify([]))
+        formData.set("filenames", JSON.stringify([]))
+
+        await updateProfile(formData, router)
+      } catch (error) {
+      } finally {
+        router.push(
+          router.asPath,
+          {
+            query: {},
+          },
+          {
+            scroll: false,
+          },
+        )
+      }
+      return
+    }
+
+    // Изменить документы / Добавить новые
+    if ((selectedImages.length > 0 && profileData && profileData.documents.length === 0) && selectedImages.some((search) => search.isNew === true) || router.query.update === "true") {
+      try {
+        const formData = new FormData()
+        for (const key in rest) {
+          // @ts-ignore
+          formData.set(key, rest[key])
+        }
+        formData.set("speciality", selectedSpecial.title)
+        formData.set("phoneNumber", `+${phoneNumber}`)
+
+        formData.set("statusChangeFile", "true")
+
+        const parsedImages: File[] = selectedImages.map((image) => image.file)
+        for (const file of parsedImages) {
+          formData.append("documents", file)
+        }
+        const parseSelectedImages: string[] = selectedImages.map((image) => image.name)
+        formData.set("filenames", JSON.stringify(parseSelectedImages))
+
+        console.log("parsedImages: ", parsedImages)
+        console.log("filenames: ", parseSelectedImages)
+
+        await updateProfile(formData, router)
+      } catch (error) {
+      } finally {
+        router.push(
+          router.asPath,
+          {
+            query: {},
+          },
+          {
+            scroll: false,
+          },
+        )
+      }
+      return
+    }
+
+    return
+    // try {
+    //   const { password, confirmPassword, speciality, phoneNumber, balance, ...rest } = data
+    //   // Если специализация такая же и не загружены новые изображения
+    //   // Отправляем базовые поля + statusChangeFile = false
+    //   if (profileData && profileData.speciality === selectedSpecial.title && profileData.documents.length &&) {
+
+    //     const formData = new FormData()
+    //     for (const key in rest) {
+    //       // @ts-ignore
+    //       formData.set(key, rest[key])
+    //     }
+    //     formData.set("speciality", selectedSpecial.title)
+    //     formData.set("phoneNumber", `+${phoneNumber}`)
+    //     const parsedImages: File[] = selectedImages.map((image) => image.file)
+
+    //     for (const file of parsedImages) {
+    //       formData.append("documents", file)
+    //     }
+    //     const parseSelectedImages: string[] = selectedImages.map((image) => image.name)
+    //     formData.set("filenames", JSON.stringify(parseSelectedImages))
+
+    //     updateProfile(formData, router)
+    //   }
+    //   return
+    //   // Если специализация такая же, но загружены новые изображения
+    //   // Отправляем базовые поля + statusChangeFile = true + documentAttachments
+    //   if (profileData && profileData.speciality === selectedSpecial.title && selectedImages.length > 0) {
+    //     // if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
+
+    //     const formData = new FormData()
+    //     for (const key in rest) {
+    //       // @ts-ignore
+    //       formData.set(key, rest[key])
+    //     }
+    //     formData.set("speciality", selectedSpecial.title)
+    //     formData.set("phoneNumber", `+${phoneNumber}`)
+    //     formData.set("statusChangeFile", "true")
+    //     const parsedImages: File[] = selectedImages.map((image) => image.file)
+
+    //     // TODO: Добавить, когда будет готов метод
+    //     // for (const file of parsedImages) {
+    //     //   formData.append("documents", file)
+    //     // }
+
+    //     updateProfile(formData, router)
+    //   }
+
+    //   // Если специализация другая
+    //   // Отправляем базовые поля + обновленная специализация + statusChangeFile = true + documentAttachments
+    //   if (profileData && profileData.speciality !== selectedSpecial.title) {
+    //     if (selectedImages.length !== selectedSpecialCount) return toast.error(`Выбрано файлов ${selectedImages.length} из ${selectedSpecialCount}`)
+
+    //     const formData = new FormData()
+    //     for (const key in rest) {
+    //       // @ts-ignore
+    //       formData.set(key, rest[key])
+    //     }
+    //     formData.set("speciality", selectedSpecial.title)
+
+    //     formData.set("statusChangeFile", "true")
+    //     const parsedImages: File[] = selectedImages.map((image) => image.file)
+
+    //     // TODO: Добавить, когда будет готов метод
+    //     // for (const file of parsedImages) {
+    //     //   formData.append("documents", file)
+    //     // }
+
+    //     updateProfile(formData, router)
+    //   }
+    // } catch (error) {
+    //   toast.error(`Ошибка`)
+    //   console.log(error)
+    // }
   })
 
   useEffect(() => {

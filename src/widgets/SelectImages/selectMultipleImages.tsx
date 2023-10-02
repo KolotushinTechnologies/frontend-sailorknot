@@ -6,6 +6,7 @@ import { PhotoProvider, PhotoView } from "react-photo-view"
 import { SelectFileProps } from "@/src/shared/types"
 import { FileConvertService } from "@/src/shared/http/services/fileConvertService"
 import Link from "next/link"
+import { useRouter } from "next/router"
 
 interface ExtendedFile extends File {
   documentName: string
@@ -21,6 +22,8 @@ interface ComponentProps {
 }
 
 const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
+  const router = useRouter()
+
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   const handleFileInputChange = (index: number, name: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +62,24 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
   const handleSelectFileButtonClick = (index: number, name: string) => () => {
     fileInputRefs.current[index]?.click()
+  }
+
+  const onDelete = (file: SelectFileProps) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!file.isNew) {
+      router.push(
+        router.asPath,
+        {
+          query: {
+            update: true,
+          },
+        },
+        {
+          scroll: false,
+        },
+      )
+    }
+    const filtered = selectedImages.filter((search) => search.name !== file.name)
+    setSelectedImages(filtered)
   }
 
   const renderFileInput = (index: number, name: string) => {
@@ -139,7 +160,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                     key={index}
                     className="space-y-4">
                     <ul>
-                      <li className="rounded-md bg-gray-200 p-2">
+                      <li className="relative rounded-md bg-gray-200 p-2">
                         <span>
                           {index + 1}. {doc.name}
                         </span>
@@ -148,7 +169,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
                         {isImage === false && matchFile ? (
                           <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
-                            <p>Документ {matchFile.file.name}</p>
+                            <p className="px-2 text-center">Документ {matchFile.file.name}</p>
                             {matchFile.isNew ? null : (
                               <Link
                                 target="_blank"
@@ -166,6 +187,27 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                             />
                           </PhotoView>
                         ) : null}
+
+                        {!matchFile ? null : (
+                          <button
+                            onClick={onDelete(matchFile)}
+                            type="button"
+                            className="absolute bottom-[140px] right-[10px] inline-flex items-center justify-center rounded-md bg-red-600 px-2 py-1 text-white">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="h-4 w-4 text-white">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        )}
                       </li>
                     </ul>
                   </div>
@@ -199,14 +241,15 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                         return (
                           <li
                             key={addIndex}
-                            className="rounded-md bg-gray-300 p-2">
+                            className="relative rounded-md bg-gray-300 p-2">
                             <p>
                               {index + 1}.{addIndex + 1} {addDoc}
                             </p>
                             {renderFileInput(index + addIndex, addDoc)}
+
                             {isImage === false && matchFile ? (
                               <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
-                                <p>Документ {matchFile.file.name}</p>
+                                <p className="px-2 text-center">Документ {matchFile.file.name}</p>
                                 {matchFile.isNew ? null : (
                                   <Link
                                     target="_blank"
@@ -224,6 +267,26 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                                 />
                               </PhotoView>
                             ) : null}
+                            {!matchFile ? null : (
+                              <button
+                                onClick={onDelete(matchFile)}
+                                type="button"
+                                className="absolute bottom-[140px] right-[10px] inline-flex items-center justify-center rounded-md bg-red-600 px-2 py-1 text-white">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="h-4 w-4 text-white">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                  />
+                                </svg>
+                              </button>
+                            )}
                           </li>
                         )
                       })}
