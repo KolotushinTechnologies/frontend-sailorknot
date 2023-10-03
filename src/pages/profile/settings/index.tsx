@@ -27,6 +27,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
   const [selectedImages, setSelectedImages] = useState<SelectFileProps[]>([])
   const [selectedSpecial, selectedSpecialSet] = useState<DocumentProps | null>(null)
   const [selectedSpecialCount, selectedSpecialCountSet] = useState(0)
+  const [removeDirty, removeDirtySet] = useState(false)
 
   const ref = useRef(null)
   const inputRef = useRef(null)
@@ -79,7 +80,6 @@ const Page: NextPageWithLayout<PageProps> = () => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
     const { password, confirmPassword, speciality, phoneNumber, balance, ...rest } = data
-
     // Оставить все как есть
     if (
       selectedImages.every((search) => search.isNew === false) &&
@@ -103,15 +103,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
         await updateProfile(formData, router)
       } catch (error) {
       } finally {
-        router.push(
-          router.asPath,
-          {
-            query: {},
-          },
-          {
-            scroll: false,
-          },
-        )
+        removeDirtySet(false)
       }
       return
     }
@@ -134,21 +126,13 @@ const Page: NextPageWithLayout<PageProps> = () => {
         await updateProfile(formData, router)
       } catch (error) {
       } finally {
-        router.push(
-          router.asPath,
-          {
-            query: {},
-          },
-          {
-            scroll: false,
-          },
-        )
+        removeDirtySet(false)
       }
       return
     }
 
     // Изменить документы / Добавить новые
-    if ((selectedImages.length > 0 && profileData && profileData.documents.length === 0) && selectedImages.some((search) => search.isNew === true) || router.query.update === "true") {
+    if ((selectedImages.length > 0 && profileData && profileData.documents.length === 0) || selectedImages.some((search) => search.isNew === true) || removeDirty) {
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -173,15 +157,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
         await updateProfile(formData, router)
       } catch (error) {
       } finally {
-        router.push(
-          router.asPath,
-          {
-            query: {},
-          },
-          {
-            scroll: false,
-          },
-        )
+        removeDirtySet(false)
       }
       return
     }
@@ -396,6 +372,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
               selectedSpecial={selectedSpecial}
               selectedSpecialCount={selectedSpecialCount}
               selectedSpecialCountSet={selectedSpecialCountSet}
+              removeDirtySet={removeDirtySet}
             />
           )}
 

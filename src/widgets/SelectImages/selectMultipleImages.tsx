@@ -4,7 +4,6 @@ import clsx from "clsx"
 import React, { useEffect, useRef } from "react"
 import { PhotoProvider, PhotoView } from "react-photo-view"
 import { SelectFileProps } from "@/src/shared/types"
-import { FileConvertService } from "@/src/shared/http/services/fileConvertService"
 import Link from "next/link"
 import { useRouter } from "next/router"
 
@@ -19,9 +18,10 @@ interface ComponentProps {
   selectedSpecial: DocumentProps | null
   selectedSpecialCount: number
   selectedSpecialCountSet: React.Dispatch<React.SetStateAction<number>>
+  removeDirtySet?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet }: ComponentProps) => {
+const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImages, setSelectedImages, selectedSpecialCount, selectedSpecialCountSet, removeDirtySet }: ComponentProps) => {
   const router = useRouter()
 
   const fileInputRefs = useRef<Array<HTMLInputElement | null>>([])
@@ -66,17 +66,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
   const onDelete = (file: SelectFileProps) => (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!file.isNew) {
-      router.push(
-        router.asPath,
-        {
-          query: {
-            update: true,
-          },
-        },
-        {
-          scroll: false,
-        },
-      )
+      if (removeDirtySet) removeDirtySet(true)
     }
     const filtered = selectedImages.filter((search) => search.name !== file.name)
     setSelectedImages(filtered)
@@ -146,7 +136,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
               if (matchFile) {
                 if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                  link = matchFile.url
+                  link = process.env.NODE_ENV === "production" ? matchFile.url.replace("http://", "https://") : matchFile.url
                   isImage = true
                 } else {
                   link = window.URL.createObjectURL(matchFile.file)
@@ -230,7 +220,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
                         if (matchFile) {
                           if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                            link = matchFile.url
+                            link = process.env.NODE_ENV === "production" ? matchFile.url.replace("http://", "https://") : matchFile.url
                             isImage = true
                           } else {
                             link = window.URL.createObjectURL(matchFile.file)
