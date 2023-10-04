@@ -114,7 +114,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       const parseData: CreateOneBody = {
         ...rest,
         speciality: selectedSpecial.title,
-        phoneNumber: `+${phoneNumber}`,
+        phoneNumber: `+7${phoneNumber}`,
       }
 
       try {
@@ -132,7 +132,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       const parseData: UpdateUserBody = {
         ...restInfo,
         speciality: selectedSpecial.title,
-        phoneNumber: `+${phoneNumber}`,
+        phoneNumber: `+7${phoneNumber}`,
       }
 
       try {
@@ -154,6 +154,10 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       formSetValue("surname", surname)
       formSetValue("dateBirth", dateBirth)
       formSetValue("city", city)
+      formSetValue("city", city)
+      
+      const parsedPhone = `${phoneNumber.slice(2)}`
+      formSetValue("phoneNumber", parsedPhone)
 
       const matchSpecial = documents.find((document) => document.title === speciality)
 
@@ -250,18 +254,24 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
               <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Телефон</label>
-              <IMaskInput
-                mask={"+{7}(000)000-00-00"}
-                radix="."
-                className="form-input"
-                value={user ? `${user.phoneNumber.slice(1)}` : getValues("phoneNumber")}
-                unmask={true}
-                ref={ref}
-                onFocus={undefined}
-                inputRef={inputRef} // access to nested input
-                onAccept={(value, mask) => formSetValue("phoneNumber", value)}
-                placeholder="Номер телефона"
-              />
+              <div className="flex h-[46px]">
+                <span className="flex h-full items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400">
+                  +7
+                </span>
+                <IMaskInput
+                  mask={"(000)000-00-00"}
+                  radix="."
+                  className="block h-full w-full min-w-0 flex-1 rounded-none rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                  {...register("phoneNumber", { required: true })}
+                  value={getValues("phoneNumber")}
+                  unmask={true}
+                  ref={ref}
+                  onFocus={undefined}
+                  inputRef={inputRef}
+                  onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+                  placeholder="Введите номер телефона без 8 или +7"
+                />
+              </div>
             </div>
 
             <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">

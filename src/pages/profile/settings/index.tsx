@@ -80,6 +80,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
     const { password, confirmPassword, speciality, phoneNumber, balance, ...rest } = data
+
     // Оставить все как есть
     if (
       selectedImages.every((search) => search.isNew === false) &&
@@ -88,6 +89,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
       profileData &&
       profileData.speciality === selectedSpecial.title
     ) {
+      console.log('Оставить все как есть');
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -95,7 +97,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           formData.set(key, rest[key])
         }
         formData.set("speciality", selectedSpecial.title)
-        formData.set("phoneNumber", `+${phoneNumber}`)
+        formData.set("phoneNumber", `+7${phoneNumber}`)
 
         formData.set("documents", JSON.stringify([]))
         formData.set("filenames", JSON.stringify([]))
@@ -110,6 +112,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
     // Удалить все документы
     if (selectedImages.length === 0 && profileData && profileData.documents.length > 0) {
+      console.log('Удалить все документы');
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -117,7 +120,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           formData.set(key, rest[key])
         }
         formData.set("speciality", selectedSpecial.title)
-        formData.set("phoneNumber", `+${phoneNumber}`)
+        formData.set("phoneNumber", `+7${phoneNumber}`)
 
         formData.set("statusChangeFile", "false")
         formData.set("documents", JSON.stringify([]))
@@ -133,6 +136,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
     // Изменить документы / Добавить новые
     if ((selectedImages.length > 0 && profileData && profileData.documents.length === 0) || selectedImages.some((search) => search.isNew === true) || removeDirty) {
+      console.log('Изменить документы / Добавить новые');
+      
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -140,7 +145,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
           formData.set(key, rest[key])
         }
         formData.set("speciality", selectedSpecial.title)
-        formData.set("phoneNumber", `+${phoneNumber}`)
+        formData.set("phoneNumber", `+7${phoneNumber}`)
 
         formData.set("statusChangeFile", "true")
 
@@ -246,7 +251,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
       formSetValue("lastname", lastname)
       formSetValue("surname", surname)
       formSetValue("dateBirth", dateBirth)
-      const parsedPhone = `${phoneNumber.slice(1)}`
+      const parsedPhone = `${phoneNumber.slice(2)}`
       formSetValue("phoneNumber", parsedPhone)
       formSetValue("city", city)
 
@@ -312,9 +317,30 @@ const Page: NextPageWithLayout<PageProps> = () => {
           </div>
 
           <div className="mb-4">
+            <div className="flex h-[46px]">
+              <span className="flex h-full items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-200 px-3 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-400">
+                +7
+              </span>
+              <IMaskInput
+                mask={"(000)000-00-00"}
+                radix="."
+                className="block h-full w-full min-w-0 flex-1 rounded-none rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                {...register("phoneNumber", { required: true })}
+                value={getValues("phoneNumber")}
+                unmask={true}
+                ref={ref}
+                onFocus={undefined}
+                inputRef={inputRef}
+                onAccept={(value, mask) => formSetValue("phoneNumber", value)}
+                placeholder="Введите номер телефона без 8 или +7"
+              />
+            </div>
+          </div>
+
+          {/* <div className="mb-4">
             <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Номер телефона</label>
             <IMaskInput
-              mask={"+{7}(000)000-00-00"}
+                mask={"(000)000-00-00"}
               radix="."
               className="form-input"
               value={getValues("phoneNumber")}
@@ -325,7 +351,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
               onAccept={(value, mask) => formSetValue("phoneNumber", value)}
               placeholder="Номер телефона"
             />
-          </div>
+          </div> */}
 
           <div className="mb-4">
             <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Город присутствия</label>
