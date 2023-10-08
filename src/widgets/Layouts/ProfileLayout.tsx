@@ -21,7 +21,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
 
   return (
     <>
-      <div className="main-container flex">
+      <div className="main-container flex min-h-screen">
         <AppSidebar
           isSmall={isSmall}
           handler={closeSideBarActiveHandler}

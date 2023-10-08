@@ -2,7 +2,6 @@ import type { AppProps } from "next/app"
 import { ReactElement, ReactNode } from "react"
 import { NextPage } from "next"
 import "@/shared/styles/globals.css"
-import { ConfirmModal } from "../widgets/Modals/Dashboard/ConfirmModal"
 import "flowbite"
 import dynamic from "next/dynamic"
 const Toaster = dynamic(
@@ -11,6 +10,19 @@ const Toaster = dynamic(
     ssr: false,
   },
 )
+const ConfirmModal = dynamic(
+  import("../widgets/Modals/Dashboard/ConfirmModal").then((module) => module.ConfirmModal),
+  {
+    ssr: false,
+  },
+)
+const DocumentModal = dynamic(
+  import("../widgets/Modals/DocumentModal").then((module) => module.DocumentModal),
+  {
+    ssr: false,
+  },
+)
+
 import "react-photo-view/dist/react-photo-view.css"
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -27,6 +39,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Component {...pageProps} />
       <ConfirmModal />
+      <DocumentModal />
       <Toaster position="bottom-right" />
     </>,
   )

@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <>
-      <div className="main-container flex">
+      <div className="main-container flex min-h-screen">
         <AppSidebar
           profileData={profileData}
           isSmall={isSmall}

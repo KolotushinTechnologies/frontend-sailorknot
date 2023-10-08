@@ -6,6 +6,7 @@ import { PhotoProvider, PhotoView } from "react-photo-view"
 import { SelectFileProps } from "@/src/shared/types"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { documentModalIsActiveToggle, selectedFileHandler } from "@/src/shared/store/modalStore"
 
 interface ExtendedFile extends File {
   documentName: string
@@ -31,7 +32,8 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
     if (files) {
       let file = files[0] as ExtendedFile
-      file.documentName = name
+      // TODO: Add if need
+      // file.documentName = name
 
       // try {
       //   const formData = new FormData()
@@ -105,6 +107,14 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
     )
   }
 
+  const openDocumentModal = (file: SelectFileProps) => (e: React.MouseEvent<HTMLElement>) => {
+    if (!file.file.type.includes("pdf")) {
+      return window.open(`${file.url}`, '_blank');
+    }
+    selectedFileHandler(file)
+    documentModalIsActiveToggle(true)
+  }
+
   useEffect(() => {
     setSelectedImages([])
     if (selectedSpecial) {
@@ -156,18 +166,18 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                         </span>
                         {/* INPUT FILE PICKER */}
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
-
+                        
                         {isImage === false && matchFile ? (
                           <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
                             <p className="px-2 text-center">Документ {matchFile.file.name}</p>
-                            {matchFile.isNew ? null : (
-                              <Link
-                                target="_blank"
-                                href={`${matchFile.url}`}
-                                className="rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400">
-                                Открыть / Скачать
-                              </Link>
-                            )}
+                            <button
+                              onClick={openDocumentModal(matchFile)}
+                              type="button"
+                              className={clsx("rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400", {
+                                hidden: matchFile.isNew
+                              })}>
+                              Открыть / Скачать
+                            </button>
                           </div>
                         ) : isImage === true && matchFile ? (
                           <PhotoView src={link}>
@@ -240,14 +250,12 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                             {isImage === false && matchFile ? (
                               <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
                                 <p className="px-2 text-center">Документ {matchFile.file.name}</p>
-                                {matchFile.isNew ? null : (
-                                  <Link
-                                    target="_blank"
-                                    href={`${matchFile.url}`}
-                                    className="rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400">
-                                    Открыть / Скачать
-                                  </Link>
-                                )}
+                                <button
+                                  onClick={openDocumentModal(matchFile)}
+                                  type="button"
+                                  className="rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400">
+                                  Открыть / Скачать
+                                </button>
                               </div>
                             ) : isImage === true && matchFile ? (
                               <PhotoView src={link}>

@@ -11,6 +11,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^38.1.1",
     "@ckeditor/ckeditor5-react": "^6.1.0",
+    "@cyntler/react-doc-viewer": "^1.13.0",
     "@formkit/auto-animate": "^0.7.0",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
@@ -41,6 +42,8 @@
     "postcss": "8.4.24",
     "pullstate": "^1.25.0",
     "react": "18.2.0",
+    "react-doc-viewer": "^0.1.5",
+    "react-documents": "^1.2.1",
     "react-dom": "18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
     "react-hook-form": "^7.45.4",
