@@ -57,7 +57,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
       const promises = data.data.documents.map(async (image) => {
         try {
-          const response = await fetch(image.link)
+          const response = await fetch(image.link.replace("http", "https"))
           const blob = await response.blob()
           const file = new File([blob], image.name)
 
@@ -65,7 +65,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
             file,
             isNew: false,
             name: image.name,
-            url: image.link,
+            url: image.link.replace("http", "https"),
           }
           files.push(preparedFile)
         } catch (error) {}
