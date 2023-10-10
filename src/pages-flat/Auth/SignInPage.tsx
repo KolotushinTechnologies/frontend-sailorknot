@@ -30,7 +30,7 @@ const SignInPage: FC<ComponentProps> = () => {
       const { data: res } = await AuthService.login(parseData)
       localStorage.setItem(AVAILABLE_LS_KEYS.token, res.token)
       toast.success(`Успех`)
-      router.push("/profile")
+      router.push("/profile/settings")
     } catch (error) {
       toast.error("Ошибка")
       console.log(error)

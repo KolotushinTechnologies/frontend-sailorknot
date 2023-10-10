@@ -14,6 +14,7 @@ import { ProfileStore } from "@/src/shared/store/profileStore"
 import updateProfile from "@/src/shared/helpers/updateProfile"
 import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 import clsx from "clsx"
+import { http } from "@/src/shared/http"
 
 interface PageProps {}
 interface FormProps extends RegisterRequest {
@@ -57,8 +58,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
       const promises = data.data.documents.map(async (image) => {
         try {
-          const response = await fetch(image.link.replace("http", "https"))
-          const blob = await response.blob()
+          const response = await http(image.link.replace("http", "https"))
+          const blob = await response.data.blob()
           const file = new File([blob], image.name)
 
           const preparedFile: SelectFileProps = {
