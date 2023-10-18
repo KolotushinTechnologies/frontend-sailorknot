@@ -109,7 +109,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
   const openDocumentModal = (file: SelectFileProps) => (e: React.MouseEvent<HTMLElement>) => {
     if (!file.file.type.includes("pdf")) {
-      return window.open(`${file.url}`, '_blank');
+      return window.open(`${file.url}`, "_blank")
     }
     selectedFileHandler(file)
     documentModalIsActiveToggle(true)
@@ -146,7 +146,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
               if (matchFile) {
                 if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                  link = matchFile.url.replace("http","https")
+                  link = matchFile.url.replace("http", "https")
                   isImage = true
                 } else {
                   link = window.URL.createObjectURL(matchFile.file)
@@ -164,9 +164,27 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                         <span>
                           {index + 1}. {doc.name}
                         </span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата начала</label>
+                            <input
+                              type="text"
+                              placeholder="Дата начала"
+                              className="form-input"
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата окончания</label>
+                            <input
+                              type="text"
+                              placeholder="Дата окончания"
+                              className="form-input"
+                            />
+                          </div>
+                        </div>
                         {/* INPUT FILE PICKER */}
                         {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
-                        
+
                         {isImage === false && matchFile ? (
                           <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
                             <p className="px-2 text-center">Документ {matchFile.file.name}</p>
@@ -174,7 +192,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                               onClick={openDocumentModal(matchFile)}
                               type="button"
                               className={clsx("rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400", {
-                                hidden: matchFile.isNew
+                                hidden: matchFile.isNew,
                               })}>
                               Открыть / Скачать
                             </button>
@@ -230,7 +248,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
                         if (matchFile) {
                           if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                            link = matchFile.url.replace("http","https")
+                            link = matchFile.url.replace("http", "https")
                             isImage = true
                           } else {
                             link = window.URL.createObjectURL(matchFile.file)
@@ -245,6 +263,26 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                             <p>
                               {index + 1}.{addIndex + 1} {addDoc}
                             </p>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата начала</label>
+                                <input
+                                  type="text"
+                                  placeholder="Дата начала"
+                                  className="form-input"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата окончания</label>
+                                <input
+                                  type="text"
+                                  placeholder="Дата окончания"
+                                  className="form-input"
+                                />
+                              </div>
+                            </div>
+
                             {renderFileInput(index + addIndex, addDoc)}
 
                             {isImage === false && matchFile ? (
@@ -265,6 +303,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                                 />
                               </PhotoView>
                             ) : null}
+
                             {!matchFile ? null : (
                               <button
                                 onClick={onDelete(matchFile)}
