@@ -15,6 +15,7 @@ import updateProfile from "@/src/shared/helpers/updateProfile"
 import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 import clsx from "clsx"
 import { http } from "@/src/shared/http"
+import { ParseImageService } from "@/src/shared/http/services/parseImageService"
 
 interface PageProps {}
 interface FormProps extends RegisterRequest {
@@ -59,6 +60,13 @@ const Page: NextPageWithLayout<PageProps> = () => {
       const files: SelectFileProps[] = []
 
       const promises = data.data.documents.map(async (image) => {
+
+        // TODO: Внедрить при необходимости
+        // try {
+        //   const parsed = await ParseImageService.parseImage({imageUrl: image.link})
+        // } catch (error) {
+        // }
+
         try {
           const response = await http(image.link.replace("http", "https"))
           const blob = await response.data.blob()

@@ -7,6 +7,8 @@ const http = axios.create({
 
 export class ParseImageService {
   static async parseImage(body: ParseImageBody) {
-    return await axios.post("/api/parse-image", body)
+    return await axios.post("/api/parse-image", {
+      ...body
+    })
   }
 }
