@@ -15,7 +15,7 @@ const useGetMe = (router: NextRouter) => {
     } catch (error) {
       toast.error("Выполните вход")
       if (window.location.href.includes("profile") || window.location.href.includes("dashboard")) {
-        await router.push("/")
+        // await router.push("/")
       }
     }
   }

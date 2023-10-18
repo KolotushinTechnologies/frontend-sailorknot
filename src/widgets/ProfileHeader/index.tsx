@@ -46,13 +46,15 @@ const ProfileHeader:FC<ComponentProps> = ({profileData}) => {
   return (
     <div className={clsx("mb-5 grid grid-cols-1 items-center justify-between gap-4 md:grid-cols-3", {
 
-      "animate-pulse bg-white dark:bg-black pointer-events-none": !profileData,
-      "bg-white dark:bg-black": profileData,
+      "animate-pulse bg-white dark:bg-black pointer-events-none": profileData,
+      "bg-white dark:bg-black": !profileData,
     })}>
       <div className="tabs-list table-responsive flex flex-nowrap space-x-2 overflow-auto text-sm md:col-span-2">
         {navs.map(({ label, value }) => {
+          
           const parseValue = value.toLocaleLowerCase()
-          const match = pathname === parseValue
+          let match = pathname.includes(parseValue)
+
           return (
             <Link
               key={value}

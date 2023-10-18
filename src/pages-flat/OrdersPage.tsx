@@ -19,7 +19,7 @@ const OrdersPage: FC<ComponentProps> = () => {
         Регистрация
       </Link> */}
         <div>
-          <h1 className="mb-6 text-lg font-bold">Заявки</h1>
+          <h1 className="mb-6 text-lg font-bold">Заявки 2</h1>
           <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 dark:border-gray-700 dark:bg-gray-800 md:p-12">
               <a
