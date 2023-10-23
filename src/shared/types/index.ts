@@ -9,4 +9,6 @@ export interface SelectFileProps {
   name: string
   isNew: boolean
   url?: string
+  manualFirstField?: string
+  manualSecondField?: string
 }

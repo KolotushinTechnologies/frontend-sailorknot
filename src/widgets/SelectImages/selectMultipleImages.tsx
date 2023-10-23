@@ -4,7 +4,6 @@ import clsx from "clsx"
 import React, { useEffect, useRef } from "react"
 import { PhotoProvider, PhotoView } from "react-photo-view"
 import { SelectFileProps } from "@/src/shared/types"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import { documentModalIsActiveToggle, selectedFileHandler } from "@/src/shared/store/modalStore"
 
@@ -60,6 +59,28 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
         setSelectedImages([...filtered, updatedSelectedImages])
       }
     }
+  }
+
+  const updateManualFirstField = (documentName: string, manualFirstField: string) => {
+    const matchDocument = selectedImages.find((document) => document.name === documentName)
+    if (!matchDocument) return
+    const updDocument: SelectFileProps = {
+      ...matchDocument,
+      manualFirstField,
+    }
+    const filteredDocuments = selectedImages.filter((search) => search.name !== documentName)
+    setSelectedImages([...filteredDocuments, updDocument])
+  }
+  const updateManualSecondField = (documentName: string, manualSecondField: string) => {
+    const matchDocument = selectedImages.find((document) => document.name === documentName)
+    if (!matchDocument) return
+    const updDocument: SelectFileProps = {
+      ...matchDocument,
+      manualSecondField,
+    }
+
+    const filteredDocuments = selectedImages.filter((search) => search.name !== documentName)
+    setSelectedImages([...filteredDocuments, updDocument])
   }
 
   const handleSelectFileButtonClick = (index: number, name: string) => () => {
@@ -131,8 +152,8 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
   return (
     <PhotoProvider>
       <div
-        className={clsx("mb-6 rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all selection:bg-transparent", {
-          "pointer-events-none hidden cursor-not-allowed opacity-10": !selectedSpecial,
+        className={clsx("mb-6 rounded-lg border-[1px] border-dashed border-gray-200 bg-gray-50 p-4 transition-all", {
+          "pointer-events-none hidden opacity-10": !selectedSpecial,
           "pointer-events-auto block opacity-100": selectedSpecial,
         })}>
         {selectedSpecial && (
@@ -155,82 +176,116 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
               }
 
               if (!doc.additionDocuments) {
-                return (
-                  <div
-                    key={index}
-                    className="space-y-4">
-                    <ul>
-                      <li className="relative rounded-md bg-gray-200 p-2">
-                        <span>
-                          {index + 1}. {doc.name}
-                        </span>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата начала</label>
-                            <input
-                              type="text"
-                              placeholder="Дата начала"
-                              className="form-input"
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата окончания</label>
-                            <input
-                              type="text"
-                              placeholder="Дата окончания"
-                              className="form-input"
-                            />
-                          </div>
-                        </div>
-                        {/* INPUT FILE PICKER */}
-                        {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
+                let matchManualFirstField = selectedImages.find((search) => search.name === doc.name && search.manualFirstField?.length)
+                let matchManualSecondField = selectedImages.find((search) => search.name === doc.name && search.manualSecondField?.length)
 
-                        {isImage === false && matchFile ? (
-                          <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
-                            <p className="px-2 text-center">Документ {matchFile.file.name}</p>
-                            <button
-                              onClick={openDocumentModal(matchFile)}
-                              type="button"
-                              className={clsx("rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400", {
-                                hidden: matchFile.isNew,
-                              })}>
-                              Открыть / Скачать
-                            </button>
-                          </div>
-                        ) : isImage === true && matchFile ? (
-                          <PhotoView src={link}>
-                            <img
-                              className="h-40 w-full rounded-md object-cover"
-                              src={link}
-                            />
-                          </PhotoView>
-                        ) : null}
+                let defaultFirstField = ""
+                let defaultSecondField = ""
 
-                        {!matchFile ? null : (
-                          <button
-                            onClick={onDelete(matchFile)}
-                            type="button"
-                            className="absolute bottom-[140px] right-[10px] inline-flex items-center justify-center rounded-md bg-red-600 px-2 py-1 text-white">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="h-4 w-4 text-white">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
+                if (matchManualFirstField && matchManualFirstField !== undefined) {
+                  defaultFirstField = `${matchManualFirstField.manualFirstField}`
+                }
+                if (matchManualSecondField && matchManualSecondField !== undefined) {
+                  defaultSecondField = `${matchManualSecondField.manualFirstField}`
+                }
+                  return (
+                    <div
+                      key={index}
+                      className="space-y-4">
+                      <ul>
+                        <li className="relative rounded-md bg-gray-200 p-2">
+                          <span>
+                            {index + 1}. {doc.name}
+                          </span>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className={clsx("transition-all duration-300")}>
+                              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата начала</label>
+                              <input
+                                onChange={(e) => {
+                                  const val = e.target.value
+                                  updateManualFirstField(doc.name, val)
+                                }}
+                                defaultValue={defaultFirstField}
+                                type="text"
+                                placeholder="Дата начала"
+                                className="form-input"
                               />
-                            </svg>
-                          </button>
-                        )}
-                      </li>
-                    </ul>
-                  </div>
-                )
+                            </div>
+                            <div className={clsx("transition-all duration-300", {})}>
+                              <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата окончания</label>
+                              <input
+                                onChange={(e) => {
+                                  const val = e.target.value
+                                  updateManualSecondField(doc.name, val)
+                                }}
+                                defaultValue={defaultSecondField}
+                                type="text"
+                                placeholder="Дата окончания"
+                                className="form-input"
+                              />
+                            </div>
+                          </div>
+                          {/* INPUT FILE PICKER */}
+                          {renderFileInput(selectedSpecial.documents.length - 1 === index ? selectedSpecial.documents.length + 3 : index, doc.name)}
+
+                          {isImage === false && matchFile ? (
+                            <div className="flex h-40 w-full flex-col items-center justify-center space-y-2 rounded-md bg-gray-100">
+                              <p className="px-2 text-center">Документ {matchFile.file.name}</p>
+                              <button
+                                onClick={openDocumentModal(matchFile)}
+                                type="button"
+                                className={clsx("rounded-md bg-gray-300 px-4 py-2 transition-all duration-300 hover:bg-gray-400", {
+                                  hidden: matchFile.isNew,
+                                })}>
+                                Открыть / Скачать
+                              </button>
+                            </div>
+                          ) : isImage === true && matchFile ? (
+                            <PhotoView src={link}>
+                              <img
+                                className="h-40 w-full rounded-md object-cover"
+                                src={link}
+                              />
+                            </PhotoView>
+                          ) : null}
+
+                          {!matchFile ? null : (
+                            <button
+                              onClick={onDelete(matchFile)}
+                              type="button"
+                              className="absolute bottom-[140px] right-[10px] inline-flex items-center justify-center rounded-md bg-red-600 px-2 py-1 text-white">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="h-4 w-4 text-white">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </li>
+                      </ul>
+                    </div>
+                  )
               } else {
+                let matchManualFirstField = selectedImages.find((search) => search.name === doc.name && search.manualFirstField?.length)
+                let matchManualSecondField = selectedImages.find((search) => search.name === doc.name && search.manualSecondField?.length)
+
+                let defaultFirstField = ""
+                let defaultSecondField = ""
+
+                if (matchManualFirstField && matchManualFirstField !== undefined) {
+                  defaultFirstField = `${matchManualFirstField.manualFirstField}`
+                }
+                if (matchManualSecondField && matchManualSecondField !== undefined) {
+                  defaultSecondField = `${matchManualSecondField.manualFirstField}`
+                }
                 return (
                   // INNER LIST
                   <div
@@ -265,17 +320,27 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                             </p>
 
                             <div className="grid grid-cols-2 gap-2">
-                              <div>
+                              <div className={clsx("transition-all duration-300", {})}>
                                 <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата начала</label>
                                 <input
+                                  onChange={(e) => {
+                                    const val = e.target.value
+                                    updateManualFirstField(doc.name, val)
+                                  }}
+                                  defaultValue={defaultFirstField}
                                   type="text"
                                   placeholder="Дата начала"
                                   className="form-input"
                                 />
                               </div>
-                              <div>
+                              <div className={clsx("transition-all duration-300", {})}>
                                 <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Дата окончания</label>
                                 <input
+                                  onChange={(e) => {
+                                    const val = e.target.value
+                                    updateManualSecondField(doc.name, val)
+                                  }}
+                                  defaultValue={defaultSecondField}
                                   type="text"
                                   placeholder="Дата окончания"
                                   className="form-input"

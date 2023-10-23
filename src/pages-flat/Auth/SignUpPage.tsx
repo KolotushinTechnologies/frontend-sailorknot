@@ -43,13 +43,19 @@ const SignUpPage: FC<ComponentProps> = () => {
   } = useForm<FormProps>()
 
   const onSubmit = handleSubmit(async (data, event) => {
-    
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
 
     try {
       const { confirmPassword, phoneNumber, ...rest } = data as unknown as { [key: string]: string }
       const parsedImages: File[] = selectedImages.map((image) => image.file)
+      const manualFirstFieldArray: string[] = []
+      const manualSecondFieldArray: string[] = []
+
+      selectedImages.forEach((document) => {
+        document.manualFirstField ? manualFirstFieldArray.push(document.manualFirstField) : manualFirstFieldArray.push("")
+        document.manualSecondField ? manualSecondFieldArray.push(document.manualSecondField) : manualSecondFieldArray.push("")
+      })
 
       const formData = new FormData()
       for (const key in rest) {
@@ -58,6 +64,8 @@ const SignUpPage: FC<ComponentProps> = () => {
 
       formData.set("speciality", selectedSpecial.title)
       formData.set("phoneNumber", `+7${phoneNumber}`)
+      formData.set("manualFirstField", JSON.stringify(manualFirstFieldArray))
+      formData.set("manualSecondField", JSON.stringify(manualSecondFieldArray))
 
       const parseSelectedImages: string[] = selectedImages.map((image) => image.name)
 
@@ -157,8 +165,7 @@ const SignUpPage: FC<ComponentProps> = () => {
 
               <button
                 type="submit"
-                className="absolute right-3 top-3 hidden text-black/20 hover:text-black dark:text-white/20 dark:hover:text-white">
-              </button>
+                className="absolute right-3 top-3 hidden text-black/20 hover:text-black dark:text-white/20 dark:hover:text-white"></button>
             </div>
 
             <div className="mb-3 hidden gap-2">
