@@ -16,7 +16,7 @@ export const DashboardHeader = () => {
       <div className="tabs-list table-responsive flex flex-nowrap space-x-[20px] overflow-auto text-sm md:col-span-2">
         {parseNavigationArray.map(({ link, title, icon }) => {
           const parseValue = link().toLocaleLowerCase()
-          const match = pathname === parseValue
+          const match = pathname.includes(parseValue)
           return (
             <Link
               key={link()}

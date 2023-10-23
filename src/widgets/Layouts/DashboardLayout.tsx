@@ -5,9 +5,11 @@ import { useEffect, useState } from "react"
 import { useMedia } from "react-use"
 import { DashboardHeader } from "../DashboardHeader"
 import { ProfileStore } from "@/src/shared/store/profileStore"
+import { useRouter } from "next/router"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: profileData } = ProfileStore.useState((store) => store)
+  const router = useRouter()
   const isSmall = useMedia("(max-width: 768px)", true)
   const [isSideBarActive, isSideBarActiveSet] = useState(isSmall ? false : true)
   const toggleSideBarActiveHandler = () => isSideBarActiveSet((prev) => !prev)
@@ -17,6 +19,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isSideBarActive && !isSmall) isSideBarActiveSet(true)
     if (isSideBarActive && isSmall) isSideBarActiveSet(false)
   }, [isSmall])
+
+  useEffect(() => {
+    if (profileData) {
+      if (profileData?.roles.includes("Agent" || profileData?.roles.includes("User"))) {
+        router.push("/")
+      } else {
+      }
+    }
+  }, [profileData])
 
   return (
     <>

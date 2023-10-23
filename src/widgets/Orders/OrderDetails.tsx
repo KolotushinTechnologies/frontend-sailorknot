@@ -6,9 +6,11 @@ import React, { FC } from "react"
 interface ComponentProps {
   order: GetAdByIdResponse | null | undefined
   hideLink: boolean
+  routeToEddit: string
+  routeToEdditTitle: string
 }
 
-const OrderDetails: FC<ComponentProps> = ({ order, hideLink }) => {
+const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, routeToEdditTitle="Подробнее" }) => {
   if (!order) return null
 
   return (
@@ -57,11 +59,11 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink }) => {
       <p className="mb-4 text-lg font-normal text-gray-500 dark:text-gray-400">{order.description}</p>
 
       <Link
-        href={`orders/${order._id}`}
+        href={routeToEddit}
         className={clsx("inline-flex items-center text-lg font-medium text-blue-600 hover:underline dark:text-blue-500", {
           hidden: hideLink,
         })}>
-        Подробнее
+        {routeToEdditTitle}
         <svg
           className="ml-2 h-3.5 w-3.5"
           aria-hidden="true"
@@ -76,6 +78,7 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink }) => {
             d="M1 5h12m0 0L9 1m4 4L9 9"></path>
         </svg>
       </Link>
+      
     </div>
   )
 }

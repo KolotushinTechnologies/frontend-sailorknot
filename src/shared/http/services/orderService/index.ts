@@ -65,11 +65,15 @@ export class OrderService {
   }
 
   // Update Information For ad by ID
+  // Запрос доступен для Агентов и Администраторов
   static async updateAdById(adId: string, data: UpdateAdByIdRequest): Promise<AxiosResponse<UpdateAdByIdRequest>> {
     return await http.put(`api/ads/update/${adId}`, data)
   }
 
   // Delete ad by ID
+  /**
+   * @descr Запрос доступен для Агентов и Администраторов
+   */
   static async deleteAdById(adId: string): Promise<AxiosResponse<DeleteAdByIdResponse>> {
     return await http.delete(`api/ads/${adId}`)
   }

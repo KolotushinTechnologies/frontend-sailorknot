@@ -9,18 +9,22 @@ import { OrderService } from "@/src/shared/http/services/orderService"
 import { CreateAdRequest } from "@/src/shared/http/services/orderService/types/createAd"
 import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 import { UpdateAdByIdRequest } from "@/src/shared/http/services/orderService/types/updateAdById"
+import { ProfileStore } from "@/src/shared/store/profileStore"
 
 interface ComponentProps {
   orderId: string | undefined
+  navigateToAfterSubmit: string
 }
 
 interface FormProps extends CreateAdRequest {}
 
-export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId }) => {
+export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAfterSubmit }) => {
   const router = useRouter()
 
+  const { data: profileData } = ProfileStore.useState((store) => store)
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
   const [item, itemSet] = useState<GetAllAdsResponse | null>(null)
+  const [isAgent, isAgentSet] = useState(false)
 
   const onDeleteHandler = () => {
     if (!item || !isDeleteChecked) return
@@ -30,7 +34,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId }) => {
         try {
           const deletedItem = await OrderService.deleteAdById(item._id)
           toast.success(`Успешно удалено`)
-          router.push("/dashboard/orders")
+          router.push(navigateToAfterSubmit)
         } catch (error) {
           toast.error("Ошибка во время удаления")
         } finally {
@@ -78,7 +82,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId }) => {
     try {
       const { data: createdAd } = await OrderService.createAd(data)
       toast.success("Успешно создано")
-      router.push("/dashboard/orders")
+      router.push(navigateToAfterSubmit)
     } catch (error) {
       console.log(error)
       toast.error("Ошибка")
@@ -95,44 +99,23 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId }) => {
     }
   })
 
-  // if (!item) {
-  //   const { speciality, phoneNumber, ...rest } = data
-  //   const parseData: CreateOneBody = {
-  //     ...rest,
-  //     speciality: selectedSpecial.title,
-  //     phoneNumber: `+7${phoneNumber}`,
-  //   }
-
-  //   try {
-  //     const { data: createdUser } = await UserService.createOne(parseData)
-  //     toast.success(createdUser.data)
-  //     console.log(createdUser.data)
-  //   } catch (error) {
-  //     console.log(error)
-  //     toast.error("Ошибка")
-  //   }
-  // }
-
-  // if (user) {
-  //   const { comment, password, phoneNumber, ...restInfo } = data
-  //   const parseData: UpdateUserBody = {
-  //     ...restInfo,
-  //     speciality: selectedSpecial.title,
-  //     phoneNumber: `+7${phoneNumber}`,
-  //   }
-
-  //   try {
-  //     const { data: createdUser } = await UserService.updateUser({ user_id: item._id }, parseData)
-  //     toast.success("Успешно обновлено")
-  //   } catch (error) {
-  //     console.log(error)
-  //     toast.error("Ошибка при обновлении")
-  //   }
-  // }
-
   useEffect(() => {
-    if (orderId && orderId.length) {
-      OrderService.getAdById(orderId).then((data) => {
+    if (!orderId) return
+    if (profileData?.roles.includes("Agent")) {
+      OrderService.getAgentAdById(`${orderId}`).then((data) => {
+        itemSet(data.data)
+        updateForm.setValue("ad_id", data.data._id)
+        updateForm.setValue("title", data.data.title)
+        updateForm.setValue("companyName", data.data.companyName)
+        updateForm.setValue("ship", data.data.ship)
+        updateForm.setValue("typeOfFishing", data.data.typeOfFishing)
+        updateForm.setValue("flightDuration", data.data.flightDuration)
+        updateForm.setValue("jobTitle", data.data.jobTitle)
+        updateForm.setValue("salaryPerMonth", data.data.salaryPerMonth)
+        updateForm.setValue("description", data.data.description)
+      })
+    } else {
+      OrderService.getAdById(`${orderId}`).then((data) => {
         itemSet(data.data)
         updateForm.setValue("ad_id", data.data._id)
         updateForm.setValue("title", data.data.title)
@@ -145,7 +128,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId }) => {
         updateForm.setValue("description", data.data.description)
       })
     }
-  }, [orderId])
+  }, [orderId, profileData])
 
   return (
     <div className="grid gap-7">
