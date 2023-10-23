@@ -3,31 +3,31 @@ import { GetServerSideProps } from "next"
 import DashboardLayout from "@/src/widgets/Layouts/DashboardLayout"
 import { NextPageWithLayout } from "@/pages/_app"
 import { ParsedUrlQuery } from "querystring"
-import { DashboardUpsertUser } from "@/src/widgets/Dashboard/Users/DashboardUpsertUser"
 import { SiteLayout } from "@/src/widgets/Layouts/SiteLayout"
+import { DashboardUpsertOrder } from "@/src/widgets/Dashboard/Orders/DashboardUpsertOrder"
 
 interface PageProps {
-  userId: string
+  orderId: string | undefined
 }
 
 interface ParamProps extends ParsedUrlQuery {
-  userId: string
+  orderId: string | undefined
 }
 
-const Page: NextPageWithLayout<PageProps> = ({ userId }) => {
-  return <DashboardUpsertUser />
+const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
+  return <DashboardUpsertOrder orderId={orderId} />
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async ({ query, params }) => {
-  const { userId } = params as ParamProps
-  return { props: { userId } }
+  const { orderId } = params as ParamProps
+  return { props: { orderId } }
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
   return (
     <SiteLayout>
-    <DashboardLayout>{page}</DashboardLayout>
-  </SiteLayout>
+      <DashboardLayout>{page}</DashboardLayout>
+    </SiteLayout>
   )
 }
 

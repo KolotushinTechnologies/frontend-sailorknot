@@ -6,11 +6,9 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { ModalStore, modalStoreToggle } from "@/src/shared/store/modalStore"
 import clsx from "clsx"
 import toast from "react-hot-toast"
-import useGetUsers from "@/src/shared/hooks/useGetUsers"
 import { ProfileStore } from "@/src/shared/store/profileStore"
-import { GetAllResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 import { OrderService } from "@/src/shared/http/services/orderService"
-import useGetOrders from "@/src/shared/hooks/useGetOrders"
+import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 
 interface ComponentProps {
   page: number
@@ -23,18 +21,18 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
   const [animationParent] = useAutoAnimate()
   const router = useRouter()
   const headerTable = ["Заголовок", "Компания", "Цена", "Действия"]
+  const [triggerToUpdateItems, triggerToUpdateItemsSet] = useState(0)
 
-  const [selectedItems, selectedItemsSet] = useState<GetAllResponse[]>([])
-  const [currentItem, currentItemSet] = useState<GetAllResponse | null>(null)
+  const [items, itemsSet] = useState<GetAllAdsResponse[]>([])
+  const [selectedItems, selectedItemsSet] = useState<GetAllAdsResponse[]>([])
+  const [currentItem, currentItemSet] = useState<GetAllAdsResponse | null>(null)
 
-  //   TODO: Добавить получение заявок
-  const { orders: items, loading, updOrders } = useGetOrders()
   const [filter, filterSet] = useState("")
 
   const onChangeFilter = (event: ChangeEvent<HTMLInputElement>) => filterSet(event.target.value.toLowerCase())
   const onClearFilter = () => filterSet("")
 
-  const onSelect = (item: GetAllResponse) => (e: ChangeEvent<HTMLInputElement>) => {
+  const onSelect = (item: GetAllAdsResponse) => (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     selectedItemsSet((prevItems) => {
       if (isChecked) {
@@ -44,6 +42,8 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
       }
     })
   }
+
+  const triggerToUpdateItemsHandler = () => triggerToUpdateItemsSet(Date.now())
 
   const onSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
@@ -64,20 +64,20 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
   //   modalStoreToggle(true)
   // }
 
-  const onDeleteItem = (item: null | GetAllResponse) => async (e: any) => {
+  const onDeleteItem = (item: null | GetAllAdsResponse) => async (e: any) => {
     modalStoreToggle(true)
     if (item) {
       ModalStore.update((store) => {
-        store.modalStoreTitle = `Удалить ${item.id}?`
+        store.modalStoreTitle = `Удалить ${item._id}?`
         store.modalStoreConfirm = async () => {
           try {
-            const deletedItems = await OrderService.deleteOne(item.id)
+            const deletedItems = await OrderService.deleteAdById(item._id)
             toast.success(`Успешно удалено`)
+            triggerToUpdateItemsHandler()
             router.push("/dashboard/orders")
           } catch (error) {
             toast.error("Ошибка во время удаления")
           } finally {
-            updOrders()
             selectedItemsSet([])
             modalStoreToggle(false)
           }
@@ -93,13 +93,12 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
         store.modalStoreTitle = `Удалить ${selectedItems.length} ?`
         store.modalStoreConfirm = async () => {
           try {
-            const deletedItems = await Promise.allSettled(selectedItems.map(({ id }) => OrderService.deleteOne(id)))
-
+            const deletedItems = await Promise.allSettled(selectedItems.map(({ _id }) => OrderService.deleteAdById(_id)))
+            triggerToUpdateItemsHandler()
             toast.success(`Успешно удалено ${deletedItems.length} шт.`)
           } catch (error) {
             toast.error("Ошибка во время удаления")
           } finally {
-            updOrders()
             selectedItemsSet([])
             modalStoreToggle(false)
           }
@@ -134,15 +133,12 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
   }
 
   useEffect(() => {
-    if (profile && items.length > 0) {
-      const match = items.find((search) => search.id === profile._id)
-      if (match) {
-        currentItemSet(match)
-      } else {
-        currentItemSet(null)
-      }
+    try {
+      OrderService.getAllAds().then((data) => itemsSet(data.data))
+    } catch (error) {
+      console.log(error)
     }
-  }, [items, profile])
+  }, [triggerToUpdateItems])
 
   return (
     <>
@@ -303,14 +299,14 @@ export const DashBoardAllOrders: FC<ComponentProps> = ({ page }) => {
 
                       <td className="px-6 py-4">
                         <Link
-                          href={`${router.pathname}/${item.id}/update`}
+                          href={`${router.pathname}/${item._id}/update`}
                           className="font-medium text-blue-600 hover:underline dark:text-blue-500">
                           Редактировать
                         </Link>{" "}
                         <button
                           onClick={onDeleteItem(item)}
                           className={clsx("inline-block font-medium text-blue-600 transition-all hover:underline dark:text-blue-500", {
-                            "sr-only pointer-events-none opacity-0": currentItem && currentItem.id === item.id,
+                            "sr-only pointer-events-none opacity-0": currentItem && currentItem._id === item._id,
                           })}>
                           Удалить
                         </button>

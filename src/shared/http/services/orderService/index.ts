@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios"
 import { http } from "../../index"
-import { GetAllAdsResponse} from "./types/getAllAds"
+import { GetAllAdsResponse } from "./types/getAllAds"
 import { CreateAdRequest, CreateAdResponse } from "./types/createAd"
 import { GetAllAgentAdsResponse } from "./types/getAllAgentAds"
 import { GetAgentAdByIdResponse } from "./types/getAgentAdById"
@@ -23,7 +23,17 @@ export class OrderService {
   //   return demoOrders.find((search) => `${search.id}` === `${orderId}`)?.id
   // }
 
-  // Create a New Ad
+  /**
+   * @param title Заголовок
+     @param companyName Название компании
+     @param ship Судно
+     @param typeOfFishing Вид промысла
+     @param flightDuration Продолжительность рейса
+     @param jobTitle Должность
+     @param salaryPerMonth Заработная плата
+     @param description Описание
+   * @descr Create a New Ad. Запрос доступен для Агентов и Администраторов 
+   */
   static async createAd(data: CreateAdRequest): Promise<AxiosResponse<CreateAdResponse>> {
     return await http.post(`api/ads/create-ad`, data)
   }
