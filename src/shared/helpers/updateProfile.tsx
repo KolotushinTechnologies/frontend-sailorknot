@@ -8,7 +8,6 @@ const updateProfile = async (formData: FormData, router: NextRouter) => {
   })
   try {
     const { data: res } = await AuthService.updateProfile(formData)
-    console.log(res)
     router.push(router.asPath)
   } catch (error) {
   } finally {

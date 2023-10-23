@@ -7,15 +7,15 @@ import { DashboardUpsertUser } from "@/src/widgets/Dashboard/Users/DashboardUpse
 import { SiteLayout } from "@/src/widgets/Layouts/SiteLayout"
 
 interface PageProps {
-  userId: string
+  userId: string | undefined
 }
 
 interface ParamProps extends ParsedUrlQuery {
-  userId: string
+  userId: string | undefined
 }
 
 const Page: NextPageWithLayout<PageProps> = ({ userId }) => {
-  return <DashboardUpsertUser />
+  return <DashboardUpsertUser userId={userId} />
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async ({ query, params }) => {

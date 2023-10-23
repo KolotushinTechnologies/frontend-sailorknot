@@ -23,7 +23,6 @@ interface FormProps extends RegisterRequest {
 }
 
 const Page: NextPageWithLayout<PageProps> = () => {
-  console.log('upd');
   
   const router = useRouter()
 

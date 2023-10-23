@@ -7,7 +7,7 @@ import { NextPageWithLayout } from "@/pages/_app"
 interface PageProps {}
 
 const Page: NextPageWithLayout<PageProps> = () => {
-  return <DashboardUpsertUser />
+  return <DashboardUpsertUser userId={undefined} />
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {

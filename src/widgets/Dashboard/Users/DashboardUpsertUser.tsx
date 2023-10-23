@@ -15,11 +15,13 @@ import { UpdateUserBody } from "@/src/shared/http/services/userService/types/upd
 import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 import SelectMultipleImages from "../../SelectImages/selectMultipleImages"
 
-interface ComponentProps {}
+interface ComponentProps {
+  userId: string | undefined
+}
 
 interface FormProps extends CreateOneBody {}
 
-export const DashboardUpsertUser: FC<ComponentProps> = () => {
+export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
   const router = useRouter()
 
   const [selectedImages, setSelectedImages] = useState<SelectFileProps[]>([])
@@ -102,9 +104,8 @@ export const DashboardUpsertUser: FC<ComponentProps> = () => {
       isDeleteCheckedSet(false)
     }
   }
-
-  const userId = router.query.userId
-  const { user, loading } = useGetUser(`${userId}`)
+  
+  const { user, loading } = useGetUser(userId)
 
   const onSubmit = handleSubmit(async (data, event) => {
     if (!selectedSpecial) return toast.error(`Выбирете должность`)

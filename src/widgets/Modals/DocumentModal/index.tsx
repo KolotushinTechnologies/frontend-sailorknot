@@ -23,7 +23,6 @@ function DocumentModal() {
    */
   useEffect(() => {
     fileSet(selectedFile)
-    console.log(selectedFile)
   }, [selectedFile])
 
   return (
