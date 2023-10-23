@@ -58,7 +58,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
     if (!data || !data.data) return null
     if (data.data.documents.length > 0) {
       const files: SelectFileProps[] = []
-
+      
       const promises = data.data.documents.map(async (image) => {
         try {
           const response = await fetch(image.link)

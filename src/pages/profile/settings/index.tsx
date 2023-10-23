@@ -23,7 +23,6 @@ interface FormProps extends RegisterRequest {
 }
 
 const Page: NextPageWithLayout<PageProps> = () => {
-  
   const router = useRouter()
 
   const { data: profileData } = ProfileStore.useState((store) => store)
@@ -59,7 +58,6 @@ const Page: NextPageWithLayout<PageProps> = () => {
       const files: SelectFileProps[] = []
 
       const promises = data.data.documents.map(async (image) => {
-
         // TODO: Внедрить при необходимости
         // try {
         //   const parsed = await ParseImageService.parseImage({imageUrl: image.link})
@@ -90,6 +88,13 @@ const Page: NextPageWithLayout<PageProps> = () => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
     const { password, confirmPassword, speciality, phoneNumber, balance, ...rest } = data
+    const manualFirstFieldArray: string[] = []
+    const manualSecondFieldArray: string[] = []
+
+    selectedImages.forEach((document) => {
+      document.manualFirstField ? manualFirstFieldArray.push(document.manualFirstField) : manualFirstFieldArray.push("")
+      document.manualSecondField ? manualSecondFieldArray.push(document.manualSecondField) : manualSecondFieldArray.push("")
+    })
 
     // Оставить все как есть
     if (
@@ -99,7 +104,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
       profileData &&
       profileData.speciality === selectedSpecial.title
     ) {
-      console.log('Оставить все как есть');
+      console.log("Оставить все как есть")
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -108,6 +113,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
         }
         formData.set("speciality", selectedSpecial.title)
         formData.set("phoneNumber", `+7${phoneNumber}`)
+        formData.set("manualFirstField", JSON.stringify(manualFirstFieldArray))
+        formData.set("manualSecondField", JSON.stringify(manualSecondFieldArray))
 
         formData.set("documents", JSON.stringify([]))
         formData.set("filenames", JSON.stringify([]))
@@ -122,7 +129,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
     // Удалить все документы
     if (selectedImages.length === 0 && profileData && profileData.documents.length > 0) {
-      console.log('Удалить все документы');
+      console.log("Удалить все документы")
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -131,6 +138,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
         }
         formData.set("speciality", selectedSpecial.title)
         formData.set("phoneNumber", `+7${phoneNumber}`)
+        formData.set("manualFirstField", JSON.stringify(manualFirstFieldArray))
+        formData.set("manualSecondField", JSON.stringify(manualSecondFieldArray))
 
         formData.set("statusChangeFile", "false")
         formData.set("documents", JSON.stringify([]))
@@ -146,8 +155,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
     // Изменить документы / Добавить новые
     if ((selectedImages.length > 0 && profileData && profileData.documents.length === 0) || selectedImages.some((search) => search.isNew === true) || removeDirty) {
-      console.log('Изменить документы / Добавить новые');
-      
+      console.log("Изменить документы / Добавить новые")
+
       try {
         const formData = new FormData()
         for (const key in rest) {
@@ -156,6 +165,8 @@ const Page: NextPageWithLayout<PageProps> = () => {
         }
         formData.set("speciality", selectedSpecial.title)
         formData.set("phoneNumber", `+7${phoneNumber}`)
+        formData.set("manualFirstField", JSON.stringify(manualFirstFieldArray))
+        formData.set("manualSecondField", JSON.stringify(manualSecondFieldArray))
 
         formData.set("statusChangeFile", "true")
 

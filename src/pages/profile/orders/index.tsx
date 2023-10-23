@@ -7,6 +7,7 @@ import { OrderService } from "@/src/shared/http/services/orderService"
 import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 import { ProfileStore } from "@/src/shared/store/profileStore"
 import Link from "next/link"
+import clsx from "clsx"
 
 interface PageProps {}
 
@@ -46,7 +47,10 @@ const Page: NextPageWithLayout<PageProps> = () => {
       <h1 className="text-lg font-bold">Заявки</h1>
       <Link
         href="/profile/orders/create"
-        className="inline-block rounded-lg border border-black bg-black px-4 py-2 text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white">
+        className={clsx(" rounded-lg border border-black bg-black px-4 py-2 text-lg font-semibold text-white transition-all duration-300 hover:bg-transparent hover:text-black dark:border-lightpurple-200 dark:bg-lightpurple-200 dark:text-black dark:hover:bg-transparent dark:hover:text-white", {
+          hidden: !isAgent,
+          "inline-block": isAgent
+        })}>
         Создать заявку
       </Link>
       <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">

@@ -8,11 +8,9 @@ import { OrderService } from "@/src/shared/http/services/orderService"
 import OrderDetails from "@/src/widgets/Orders/OrderDetails"
 import { GetAdByIdResponse } from "@/src/shared/http/services/orderService/types/getAdById"
 import { ProfileStore } from "@/src/shared/store/profileStore"
-
 interface ParamProps extends ParsedUrlQuery {
   orderId: string
 }
-
 interface PageProps {
   orderId: string
 }
@@ -21,13 +19,14 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
   const { data } = ProfileStore.useState((store) => store)
   const [order, orderSet] = useState<GetAdByIdResponse | null | undefined>()
   const [isAgent, isAgentSet] = useState(false)
+  const [isUser, isUserSet] = useState(false)
 
   useEffect(() => {
     if (data) {
-      if (data?.roles.includes("Agent")) {
-        isAgentSet(true)
+      if (data?.roles.includes("User")) {
+        isUserSet(true)
       } else {
-        isAgentSet(false)
+        isUserSet(false)
       }
     }
     if (data?.roles.includes("Agent")) {
@@ -51,7 +50,7 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
       <OrderDetails
         routeToEddit={`/profile/orders/${order?._id}/update`}
         routeToEdditTitle="Редактировать"
-        hideLink={false}
+        hideLink={isUser ? true : false}
         order={order}
       />
     </div>
