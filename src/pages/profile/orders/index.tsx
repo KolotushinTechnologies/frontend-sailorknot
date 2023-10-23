@@ -1,22 +1,23 @@
-import { ReactElement } from "react"
+import { ReactElement, useEffect, useState } from "react"
 import { NextPageWithLayout } from "../../_app"
 import { SiteLayout } from "../../../widgets/Layouts/SiteLayout"
 import ProfileLayout from "@/src/widgets/Layouts/ProfileLayout"
 import OrderItem from "@/src/widgets/Orders/OrderItem"
-import { GetServerSideProps } from "next"
-import { ParsedUrlQuery } from "querystring"
-import { GetAllResponse } from "@/src/shared/http/services/orderService/types/getAll"
 import { OrderService } from "@/src/shared/http/services/orderService"
+import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 
-interface ParamProps extends ParsedUrlQuery {
-  userId: string
-}
+interface PageProps {}
 
-interface PageProps {
-  orders: GetAllResponse[]
-}
+const Page: NextPageWithLayout<PageProps> = () => {
+  const [orders, ordersSet] = useState<GetAllAdsResponse[]>([])
+  useEffect(() => {
+    try {
+      OrderService.getAllAds().then((data) => ordersSet(data.data))
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
 
-const Page: NextPageWithLayout<PageProps> = ({ orders }) => {
   return (
     <div>
       <h1 className="mb-6 text-lg font-bold">Заявки</h1>
@@ -32,11 +33,6 @@ const Page: NextPageWithLayout<PageProps> = ({ orders }) => {
       </div>
     </div>
   )
-}
-
-export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
-  const orders = OrderService.getAll()
-  return { props: { orders } }
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {

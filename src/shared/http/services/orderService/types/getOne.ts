@@ -9,3 +9,4 @@ export interface GetOneResponse {
   salaryPerMonth: string
   description: string
 }
+// сonst headerTable = ["Заголовок", "Компания", "Цена", "Действия"]

@@ -39,7 +39,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
           />
           <div className="bg-white p-4 sm:p-7">
             <ProfileHeader profileData={profileData} />
-            {profileData ? <LoadingShell /> : <>{children}</>}
+            {!profileData ? <LoadingShell /> : <>{children}</>}
           </div>
         </div>
       </div>

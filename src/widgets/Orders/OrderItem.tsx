@@ -1,10 +1,10 @@
-import { GetAllResponse } from "@/src/shared/http/services/orderService/types/getAll"
+import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 import { OrderProps } from "@/src/shared/types/orders"
 import Link from "next/link"
 import React, { FC } from "react"
 
 interface ComponentProps {
-  order: GetAllResponse
+  order: GetAllAdsResponse
 }
 
 const OrderItem: FC<ComponentProps> = ({ order }) => {
@@ -65,7 +65,7 @@ const OrderItem: FC<ComponentProps> = ({ order }) => {
       <p className="mb-4 text-lg font-normal text-gray-500 dark:text-gray-400">{description}</p>
 
       <Link
-        href={`orders/${order.id}`}
+        href={`orders/${order._id}`}
         className="inline-flex items-center text-lg font-medium text-blue-600 hover:underline dark:text-blue-500">
         Подробнее
         <svg

@@ -1,5 +1,5 @@
+import { http } from '@/src/shared/http';
 import { LoginRequest, LoginResponse } from "./types/login"
-import { http } from "../../index"
 import { RegisterResponse } from "./types/register"
 import { GetUserResponse } from "./types/getUser"
 import { UpdateProfileResponse } from "./types/updateProfile"
