@@ -6,6 +6,7 @@ import HomePage from "../pages-flat/HomePage"
 interface PageProps {}
 
 const Page: NextPageWithLayout<PageProps> = () => {
+  console.log('test');
   return <HomePage />
 }
 
