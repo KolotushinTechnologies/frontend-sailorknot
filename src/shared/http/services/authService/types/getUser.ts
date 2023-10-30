@@ -13,6 +13,8 @@ export interface GetUserResponse {
     documents: Array<{
       name: string
       link: string
+      manualFirstField: string
+      manualSecondField: string
       _id: string
     }>
     createdAt: string

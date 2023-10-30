@@ -46,16 +46,20 @@ const SignUpPage: FC<ComponentProps> = () => {
     if (data.password !== data.confirmPassword) return toast.error(`Пароли должны совпадать`)
     if (!selectedSpecial) return toast.error(`Выбирете должность`, {})
 
+    const manualFirstFieldArray: string[] = []
+    const manualSecondFieldArray: string[] = []
+
+    selectedImages.forEach((document) => {
+      document.manualFirstField ? manualFirstFieldArray.push(document.manualFirstField) : manualFirstFieldArray.push("")
+      document.manualSecondField ? manualSecondFieldArray.push(document.manualSecondField) : manualSecondFieldArray.push("")
+    })
+
     try {
       const { confirmPassword, phoneNumber, ...rest } = data as unknown as { [key: string]: string }
       const parsedImages: File[] = selectedImages.map((image) => image.file)
-      const manualFirstFieldArray: string[] = []
-      const manualSecondFieldArray: string[] = []
 
-      selectedImages.forEach((document) => {
-        document.manualFirstField ? manualFirstFieldArray.push(document.manualFirstField) : manualFirstFieldArray.push("")
-        document.manualSecondField ? manualSecondFieldArray.push(document.manualSecondField) : manualSecondFieldArray.push("")
-      })
+      console.log(manualFirstFieldArray)
+      console.log(manualSecondFieldArray)
 
       const formData = new FormData()
       for (const key in rest) {

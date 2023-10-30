@@ -2,7 +2,9 @@ async function convertUrlImagesToFiles(urlImages: string[]): Promise<File[]> {
   const filePromises: Promise<File>[] = []
 
   for (const imageUrl of urlImages) {
-    const response = await fetch(imageUrl)
+    const response = await fetch(imageUrl, {
+      mode: "no-cors",
+    })
     const blob = await response.blob()
 
     const fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1)

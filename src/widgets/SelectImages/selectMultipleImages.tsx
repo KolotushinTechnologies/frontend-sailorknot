@@ -167,7 +167,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
               if (matchFile) {
                 if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                  link = matchFile.url.replace("http", "https")
+                  link = matchFile.url
                   isImage = true
                 } else {
                   link = window.URL.createObjectURL(matchFile.file)
@@ -303,7 +303,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
 
                         if (matchFile) {
                           if (matchFile.url && matchFile.url.length > 0 && !matchFile.url.includes(".doc") && !matchFile.url.includes(".pdf")) {
-                            link = matchFile.url.replace("http", "https")
+                            link = matchFile.url
                             isImage = true
                           } else {
                             link = window.URL.createObjectURL(matchFile.file)

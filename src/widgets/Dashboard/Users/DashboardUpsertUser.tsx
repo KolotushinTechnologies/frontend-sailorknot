@@ -61,7 +61,9 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
       
       const promises = data.data.documents.map(async (image) => {
         try {
-          const response = await fetch(image.link)
+          const response = await fetch(image.link, {
+            mode: "no-cors",
+          })
           const blob = await response.blob()
           const file = new File([blob], image.name)
 

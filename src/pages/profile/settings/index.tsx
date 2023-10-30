@@ -58,22 +58,22 @@ const Page: NextPageWithLayout<PageProps> = () => {
       const files: SelectFileProps[] = []
 
       const promises = data.data.documents.map(async (image) => {
-        // TODO: Внедрить при необходимости
-        // try {
-        //   const parsed = await ParseImageService.parseImage({imageUrl: image.link})
-        // } catch (error) {
-        // }
-
         try {
-          const response = await http(image.link.replace("http", "https"))
-          const blob = await response.data.blob()
+          const response = await fetch(image.link, {
+            mode: "no-cors",
+          })
+          const blob = await response.blob()
           const file = new File([blob], image.name)
 
+          console.log(image);
+          
           const preparedFile: SelectFileProps = {
             file,
             isNew: false,
             name: image.name,
-            url: image.link.replace("http", "https"),
+            url: image.link,
+            manualFirstField: image.manualFirstField,
+            manualSecondField: image.manualSecondField,
           }
           files.push(preparedFile)
         } catch (error) {}

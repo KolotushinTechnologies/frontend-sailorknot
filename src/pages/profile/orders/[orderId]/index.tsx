@@ -20,6 +20,7 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
   const [order, orderSet] = useState<GetAdByIdResponse | null | undefined>()
   const [isAgent, isAgentSet] = useState(false)
   const [isUser, isUserSet] = useState(false)
+  const [isAdmin, isAdminSet] = useState(false)
 
   useEffect(() => {
     if (data) {
@@ -27,6 +28,11 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
         isUserSet(true)
       } else {
         isUserSet(false)
+      }
+      if (data?.roles.includes("Admin") || data?.roles.includes("SuperAdmin")) {
+        isAdminSet(true)
+      } else {
+        isAdminSet(false)
       }
     }
     if (data?.roles.includes("Agent")) {
@@ -48,9 +54,10 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
     <div>
       <h1 className="mb-6 text-lg font-bold">Заявка {order?._id}</h1>
       <OrderDetails
-        routeToEddit={`/profile/orders/${order?._id}/update`}
+        routeToEddit={!isAdmin ? `/profile/orders/${order?._id}/update` : `/dashboard/orders/${order?._id}/update`}
+        // routeToEdditTitle="Редактировать"
         routeToEdditTitle="Редактировать"
-        hideLink={isUser ? true : false}
+        hideLink={isUser ? true : isAdmin ? false : false}
         order={order}
       />
     </div>
