@@ -8,6 +8,9 @@ import { SearchAgentAdsResponse } from "./types/searchAgentAds"
 import { GetAdByIdResponse } from "./types/getAdById"
 import { UpdateAdByIdRequest } from "./types/updateAdById"
 import { DeleteAdByIdResponse } from "./types/deleteAdById"
+import { CreateRespondBody, CreateRespondParams, CreateRespondResponse } from "./types/createRespond"
+import { GetUserResponsesParams, GetUserResponsesResponse } from "./types/getUserResponses"
+import { GetAgentResponsesParams, GetAgentResponsesResponse } from "./types/getAgentResponses"
 export class OrderService {
   // static async getAll() {
   //   return await http.get<GetAllResponse[]>("api/ads/all")
@@ -36,6 +39,24 @@ export class OrderService {
    */
   static async createAd(data: CreateAdRequest): Promise<AxiosResponse<CreateAdResponse>> {
     return await http.post(`api/ads/create-ad`, data)
+  }
+  /**
+   * @descr Create respond to ad by ID. Запрос доступен для Пользователей и Администраторов
+   */
+  static async createRespond({ ad_id }: CreateRespondParams, data: CreateRespondBody): Promise<AxiosResponse<CreateRespondResponse>> {
+    return await http.post(`api/ads/create-respond/${ad_id}`, data)
+  }
+  /**
+   * @descr Get user responses all. Запрос доступен для Пользователей и Администраторов
+   */
+  static async getUserResponses({ ad_id }: GetUserResponsesParams): Promise<AxiosResponse<GetUserResponsesResponse[]>> {
+    return await http.get(`api/ads/user-responses/all/${ad_id}`)
+  }
+  /**
+   * @descr Get agent responses all. Запрос доступен для Агентов и Администраторов
+   */
+  static async getAgentResponses({ ad_id }: GetAgentResponsesParams): Promise<AxiosResponse<GetAgentResponsesResponse[]>> {
+    return await http.get(`api/ads/agent-responses/all/${ad_id}`)
   }
   // Get all agent ads
   static async getAllAgentAds(): Promise<AxiosResponse<GetAllAgentAdsResponse[]>> {
