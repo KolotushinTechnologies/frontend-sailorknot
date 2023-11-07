@@ -13,6 +13,8 @@ export interface GetOneResponse {
     name: string
     link: string
     _id: string
+    manualFirstField?: string
+    manualSecondField?: string
   }>
   createdAt: string
   updatedAt: string

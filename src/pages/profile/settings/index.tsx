@@ -16,6 +16,7 @@ import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 import clsx from "clsx"
 import { http } from "@/src/shared/http"
 import { ParseImageService } from "@/src/shared/http/services/parseImageService"
+import { praseUrlToFile } from "@/src/shared/helpers/praseUrlToFile"
 
 interface PageProps {}
 interface FormProps extends RegisterRequest {
@@ -59,13 +60,7 @@ const Page: NextPageWithLayout<PageProps> = () => {
 
       const promises = data.data.documents.map(async (image) => {
         try {
-          const response = await fetch(image.link, {
-            mode: "no-cors",
-          })
-          const blob = await response.blob()
-          const file = new File([blob], image.name)
-
-          console.log(image);
+          const file = await praseUrlToFile(image.link, image.name)
           
           const preparedFile: SelectFileProps = {
             file,

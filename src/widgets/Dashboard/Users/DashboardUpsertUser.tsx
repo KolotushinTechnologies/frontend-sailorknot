@@ -14,6 +14,7 @@ import toast from "react-hot-toast"
 import { UpdateUserBody } from "@/src/shared/http/services/userService/types/updateOne"
 import { ProfileProps, SelectFileProps } from "@/src/shared/types"
 import SelectMultipleImages from "../../SelectImages/selectMultipleImages"
+import { praseUrlToFile } from "@/src/shared/helpers/praseUrlToFile"
 
 interface ComponentProps {
   userId: string | undefined
@@ -61,11 +62,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
       
       const promises = data.data.documents.map(async (image) => {
         try {
-          const response = await fetch(image.link, {
-            mode: "no-cors",
-          })
-          const blob = await response.blob()
-          const file = new File([blob], image.name)
+          const file = await praseUrlToFile(image.link, image.name)
 
           const preparedFile: SelectFileProps = {
             file,
@@ -172,8 +169,17 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
         }
       }
 
-      if (selectedImages.length === 0) {
-        parseImages({ data: { data: user } })
+      if (selectedImages.length === 0 && user) {
+        parseImages({ data: { data: {
+          ...user,
+          documents: user.documents.map(item=>({
+            _id: item._id,
+            link: item.link,
+            name: item.name,
+            manualFirstField: item.manualFirstField || "",
+            manualSecondField: item.manualSecondField || "",
+          }))
+        } } })
       }
     }
   }, [user])
