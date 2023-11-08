@@ -8,6 +8,7 @@ import { OrderService } from "@/src/shared/http/services/orderService"
 import OrderDetails from "@/src/widgets/Orders/OrderDetails"
 import { GetAdByIdResponse } from "@/src/shared/http/services/orderService/types/getAdById"
 import { ProfileStore } from "@/src/shared/store/profileStore"
+import useGetRoles from "@/src/shared/hooks/useGetRoles"
 interface ParamProps extends ParsedUrlQuery {
   orderId: string
 }
@@ -16,48 +17,36 @@ interface PageProps {
 }
 
 const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
-  const { data } = ProfileStore.useState((store) => store)
+  const { data: userData } = ProfileStore.useState((store) => store)
   const [order, orderSet] = useState<GetAdByIdResponse | null | undefined>()
-  const [isAgent, isAgentSet] = useState(false)
-  const [isUser, isUserSet] = useState(false)
-  const [isAdmin, isAdminSet] = useState(false)
+  const { isUser, isAgent, isAdmin } = useGetRoles()
 
   useEffect(() => {
-    if (data) {
-      if (data?.roles.includes("User")) {
-        isUserSet(true)
+    if (userData) {
+      if (isAgent) {
+        try {
+          OrderService.getAgentAdById(orderId).then((data) => orderSet(data.data))
+        } catch (error) {
+          console.log(error)
+        }
       } else {
-        isUserSet(false)
-      }
-      if (data?.roles.includes("Admin") || data?.roles.includes("SuperAdmin")) {
-        isAdminSet(true)
-      } else {
-        isAdminSet(false)
+        try {
+          OrderService.getAdById(orderId).then((data) => orderSet(data.data))
+        } catch (error) {
+          console.log(error)
+        }
       }
     }
-    if (data?.roles.includes("Agent")) {
-      try {
-        OrderService.getAgentAdById(orderId).then((data) => orderSet(data.data))
-      } catch (error) {
-        console.log(error)
-      }
-    } else {
-      try {
-        OrderService.getAdById(orderId).then((data) => orderSet(data.data))
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }, [data])
+  }, [userData])
 
   return (
     <div>
       <h1 className="mb-6 text-lg font-bold">Заявка {order?._id}</h1>
       <OrderDetails
         routeToEddit={!isAdmin ? `/profile/orders/${order?._id}/update` : `/dashboard/orders/${order?._id}/update`}
-        // routeToEdditTitle="Редактировать"
         routeToEdditTitle="Редактировать"
         hideLink={isUser ? true : isAdmin ? false : false}
+        hideRespondForm={isAdmin || isAgent}
         order={order}
       />
     </div>

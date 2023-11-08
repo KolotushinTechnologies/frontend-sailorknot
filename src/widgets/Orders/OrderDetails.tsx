@@ -17,9 +17,10 @@ interface ComponentProps {
   hideLink: boolean
   routeToEddit: string
   routeToEdditTitle: string
+  hideRespondForm?: boolean
 }
 
-const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, routeToEdditTitle = "Подробнее" }) => {
+const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, routeToEdditTitle = "Подробнее", hideRespondForm = false }) => {
   const { data: userData } = ProfileStore.useState((store) => store)
   const { loading, updLoading } = useLoading({})
   const [orderResponses, setOrderResponses] = useState<GetUserResponsesResponse[]>([])
@@ -120,7 +121,10 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, route
         </svg>
       </Link>
       <div className="space-y-2">
-        <form>
+        <form
+          className={clsx("", {
+            hidden: hideRespondForm,
+          })}>
           <label
             htmlFor="respond"
             className="sr-only mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -168,6 +172,7 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, route
           </div>
         </form>
         <div className="min-h-[300px]">
+          <h2 className="mb-6 text-lg  font-bold text-gray-900 dark:text-white lg:text-2xl">Отклики ({orderResponses.length})</h2>
           {!orderResponses.length
             ? null
             : orderResponses
