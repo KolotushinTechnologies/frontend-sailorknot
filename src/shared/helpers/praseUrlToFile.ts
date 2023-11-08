@@ -1,6 +1,6 @@
 export async function praseUrlToFile(url: string, fileName: string) {
   let parseUrl = url
-  if (process.env.NODE_ENV === "production") parseUrl.replace("http:", "https:")
+  if (process.env.NODE_ENV === "production") parseUrl = parseUrl.replace("http:", "https:")
   const response = await fetch(parseUrl, {
     mode: "no-cors",
   })
