@@ -186,7 +186,7 @@ const SelectMultipleImages = ({ disabled = false, selectedSpecial, selectedImage
                   defaultFirstField = `${matchManualFirstField.manualFirstField}`
                 }
                 if (matchManualSecondField && matchManualSecondField !== undefined) {
-                  defaultSecondField = `${matchManualSecondField.manualFirstField}`
+                  defaultSecondField = `${matchManualSecondField.manualSecondField}`
                 }
                   return (
                     <div
