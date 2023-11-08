@@ -154,11 +154,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
       formSetValue("surname", surname)
       formSetValue("dateBirth", dateBirth)
       formSetValue("city", city)
-      formSetValue("city", city)
       
-      const parsedPhone = `${phoneNumber.slice(2)}`
-      formSetValue("phoneNumber", parsedPhone)
-
       const matchSpecial = documents.find((document) => document.title === speciality)
 
       if (matchSpecial) {
@@ -272,7 +268,7 @@ export const DashboardUpsertUser: FC<ComponentProps> = ({userId}) => {
                   radix="."
                   className="block h-full w-full min-w-0 flex-1 rounded-none rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                   {...register("phoneNumber", { required: true })}
-                  value={getValues("phoneNumber")}
+                  value={user ? `${user.phoneNumber.slice(2)}` : ""}
                   unmask={true}
                   ref={ref}
                   onFocus={undefined}
