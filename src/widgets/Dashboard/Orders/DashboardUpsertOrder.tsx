@@ -10,6 +10,10 @@ import { CreateAdRequest } from "@/src/shared/http/services/orderService/types/c
 import { GetAllAdsResponse } from "@/src/shared/http/services/orderService/types/getAllAds"
 import { UpdateAdByIdRequest } from "@/src/shared/http/services/orderService/types/updateAdById"
 import { ProfileStore } from "@/src/shared/store/profileStore"
+import { GetUserResponsesResponse } from "@/src/shared/http/services/orderService/types/getUserResponses"
+import useLoading from "@/src/shared/hooks/useLoading"
+import LoadingSpinner from "@/src/shared/ui/Loader/LoadingSpinner"
+import { formatDate } from "@/src/shared/helpers/formatDate"
 
 interface ComponentProps {
   orderId: string | undefined
@@ -21,10 +25,12 @@ interface FormProps extends CreateAdRequest {}
 export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAfterSubmit }) => {
   const router = useRouter()
 
+  const { loading, updLoading } = useLoading({})
   const { data: profileData } = ProfileStore.useState((store) => store)
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
   const [item, itemSet] = useState<GetAllAdsResponse | null>(null)
   const [isAgent, isAgentSet] = useState(false)
+  const [orderResponses, setOrderResponses] = useState<GetUserResponsesResponse[]>([])
 
   const onDeleteHandler = () => {
     if (!item || !isDeleteChecked) return
@@ -129,6 +135,12 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
       })
     }
   }, [orderId, profileData])
+
+  useEffect(() => {
+    try {
+      if (orderId && orderId.length) OrderService.getUserResponses({ ad_id: orderId }).then(({ data }) => setOrderResponses(data))
+    } catch (error) {}
+  }, [orderId])
 
   return (
     <div className="grid gap-7">
@@ -313,6 +325,57 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
                     placeholder="Описание"
                     className="form-input max-h-[1000px] min-h-[100px]"
                   />
+                </div>
+
+                <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
+                  <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Отклики ({orderResponses.length})</label>
+                  <div className="min-h-[300px]">
+                    {!orderResponses.length
+                      ? null
+                      : orderResponses
+                          .sort((a, b) => {
+                            const dateA = new Date(a.createdAt)
+                            const dateB = new Date(b.createdAt)
+                            // @ts-ignore
+                            return dateB - dateA
+                          })
+                          .map((item) => {
+                            return (
+                              <div
+                                key={item._id}
+                                className="border-b border-gray-200 py-6 last:pb-0 text-base last:border-b-0 dark:border-gray-700 dark:bg-gray-900">
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="flex items-center">
+                                    <p className="mr-3 inline-flex items-center space-x-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1}
+                                        stroke="currentColor"
+                                        className="h-6 w-6 text-gray-500">
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                      </svg>
+                                      <span>{item.user.name}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                      <time
+                                        dateTime="2022-06-23"
+                                        title="June 23rd, 2022">
+                                        {formatDate(item.createdAt)}
+                                      </time>
+                                    </p>
+                                  </div>
+                                </div>
+                                <p className="text-gray-500 dark:text-gray-400">{item.description}</p>
+                              </div>
+                            )
+                          })}
+                  </div>
                 </div>
               </div>
             </div>

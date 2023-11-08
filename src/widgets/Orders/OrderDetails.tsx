@@ -186,7 +186,7 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, route
                   return (
                     <div
                       key={item._id}
-                      className="border-b border-gray-200 p-6 text-base last:border-b-0 dark:border-gray-700 dark:bg-gray-900">
+                      className="border-b border-gray-200 py-6 last:pb-0 text-base last:border-b-0 dark:border-gray-700 dark:bg-gray-900">
                       <div className="mb-2 flex items-center justify-between">
                         <div className="flex items-center">
                           <p className="mr-3 inline-flex items-center space-x-2 text-sm font-semibold text-gray-900 dark:text-white">
