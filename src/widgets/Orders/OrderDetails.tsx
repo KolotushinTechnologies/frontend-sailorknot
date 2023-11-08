@@ -1,3 +1,4 @@
+import { AVAILABLE_USER_ROLES } from "@/src/shared/constants"
 import { formatDate } from "@/src/shared/helpers/formatDate"
 import useLoading from "@/src/shared/hooks/useLoading"
 import { OrderService } from "@/src/shared/http/services/orderService"
@@ -50,10 +51,15 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, route
   })
 
   useEffect(() => {
+    if (!userData || !order) return
     try {
-      if (order) OrderService.getUserResponses({ ad_id: order._id }).then(({ data }) => setOrderResponses(data))
+      if (userData.roles.includes(AVAILABLE_USER_ROLES.agent)) {
+        OrderService.getAgentResponses({ ad_id: order._id }).then(({ data }) => setOrderResponses(data))
+      } else {
+        OrderService.getUserResponses({ ad_id: order._id }).then(({ data }) => setOrderResponses(data))
+      }
     } catch (error) {}
-  }, [order, tigger])
+  }, [order, tigger, userData])
 
   if (!order) return null
 
@@ -171,7 +177,7 @@ const OrderDetails: FC<ComponentProps> = ({ order, hideLink, routeToEddit, route
             </div>
           </div>
         </form>
-        <div className="min-h-[300px]">
+        <div>
           <h2 className="mb-6 text-lg  font-bold text-gray-900 dark:text-white lg:text-2xl">Отклики ({orderResponses.length})</h2>
           {!orderResponses.length
             ? null

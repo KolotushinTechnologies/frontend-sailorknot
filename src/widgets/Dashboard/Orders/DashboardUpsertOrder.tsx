@@ -14,6 +14,8 @@ import { GetUserResponsesResponse } from "@/src/shared/http/services/orderServic
 import useLoading from "@/src/shared/hooks/useLoading"
 import LoadingSpinner from "@/src/shared/ui/Loader/LoadingSpinner"
 import { formatDate } from "@/src/shared/helpers/formatDate"
+import useGetRoles from "@/src/shared/hooks/useGetRoles"
+import { AVAILABLE_USER_ROLES } from "@/src/shared/constants"
 
 interface ComponentProps {
   orderId: string | undefined
@@ -29,7 +31,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
   const { data: profileData } = ProfileStore.useState((store) => store)
   const [isDeleteChecked, isDeleteCheckedSet] = useState(false)
   const [item, itemSet] = useState<GetAllAdsResponse | null>(null)
-  const [isAgent, isAgentSet] = useState(false)
+  const { isAdmin, isAgent } = useGetRoles()
   const [orderResponses, setOrderResponses] = useState<GetUserResponsesResponse[]>([])
 
   const onDeleteHandler = () => {
@@ -106,8 +108,8 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
   })
 
   useEffect(() => {
-    if (!orderId) return
-    if (profileData?.roles.includes("Agent")) {
+    if (!orderId || !profileData) return
+    if (profileData.roles.includes(AVAILABLE_USER_ROLES.agent)) {
       OrderService.getAgentAdById(`${orderId}`).then((data) => {
         itemSet(data.data)
         updateForm.setValue("ad_id", data.data._id)
@@ -137,10 +139,13 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
   }, [orderId, profileData])
 
   useEffect(() => {
-    try {
-      if (orderId && orderId.length) OrderService.getUserResponses({ ad_id: orderId }).then(({ data }) => setOrderResponses(data))
-    } catch (error) {}
-  }, [orderId])
+    if (!profileData || !orderId || !orderId.length) return
+    if (profileData.roles.includes(AVAILABLE_USER_ROLES.agent)) {
+      OrderService.getAgentResponses({ ad_id: orderId }).then(({ data }) => setOrderResponses(data))
+    } else {
+      OrderService.getUserResponses({ ad_id: orderId }).then(({ data }) => setOrderResponses(data))
+    }
+  }, [orderId, profileData])
 
   return (
     <div className="grid gap-7">
@@ -329,7 +334,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
 
                 <div className="relative rounded-lg border border-black/10 bg-white px-5 py-4 dark:border-white/10 dark:bg-white/5">
                   <label className="mb-1 block text-xs text-black/40 dark:text-white/40">Отклики ({orderResponses.length})</label>
-                  <div className="min-h-[300px]">
+                  <div>
                     {!orderResponses.length
                       ? null
                       : orderResponses
@@ -343,7 +348,7 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
                             return (
                               <div
                                 key={item._id}
-                                className="border-b border-gray-200 py-6 last:pb-0 text-base last:border-b-0 dark:border-gray-700 dark:bg-gray-900">
+                                className="border-b border-gray-200 py-6 text-base last:border-b-0 last:pb-0 dark:border-gray-700 dark:bg-gray-900">
                                 <div className="mb-2 flex items-center justify-between">
                                   <div className="flex items-center">
                                     <p className="mr-3 inline-flex items-center space-x-2 text-sm font-semibold text-gray-900 dark:text-white">

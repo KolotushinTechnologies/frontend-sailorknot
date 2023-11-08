@@ -9,6 +9,7 @@ import OrderDetails from "@/src/widgets/Orders/OrderDetails"
 import { GetAdByIdResponse } from "@/src/shared/http/services/orderService/types/getAdById"
 import { ProfileStore } from "@/src/shared/store/profileStore"
 import useGetRoles from "@/src/shared/hooks/useGetRoles"
+import { AVAILABLE_USER_ROLES } from "@/src/shared/constants"
 interface ParamProps extends ParsedUrlQuery {
   orderId: string
 }
@@ -22,22 +23,21 @@ const Page: NextPageWithLayout<PageProps> = ({ orderId }) => {
   const { isUser, isAgent, isAdmin } = useGetRoles()
 
   useEffect(() => {
-    if (userData) {
-      if (isAgent) {
-        try {
-          OrderService.getAgentAdById(orderId).then((data) => orderSet(data.data))
-        } catch (error) {
-          console.log(error)
-        }
-      } else {
-        try {
-          OrderService.getAdById(orderId).then((data) => orderSet(data.data))
-        } catch (error) {
-          console.log(error)
-        }
+    if (!userData) return
+    if (userData.roles.includes(AVAILABLE_USER_ROLES.agent)) {
+      try {
+        OrderService.getAgentAdById(orderId).then((data) => orderSet(data.data))
+      } catch (error) {
+        console.log(error)
+      }
+    } else {
+      try {
+        OrderService.getAdById(orderId).then((data) => orderSet(data.data))
+      } catch (error) {
+        console.log(error)
       }
     }
-  }, [userData])
+  }, [userData, isAgent, isAdmin])
 
   return (
     <div>
