@@ -22,7 +22,7 @@ interface ComponentProps {
   navigateToAfterSubmit: string
 }
 
-interface FormProps extends CreateAdRequest {}
+interface FormProps extends CreateAdRequest { }
 
 export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAfterSubmit }) => {
   const router = useRouter()
@@ -338,48 +338,75 @@ export const DashboardUpsertOrder: FC<ComponentProps> = ({ orderId, navigateToAf
                     {!orderResponses.length
                       ? null
                       : orderResponses
-                          .sort((a, b) => {
-                            const dateA = new Date(a.createdAt)
-                            const dateB = new Date(b.createdAt)
-                            // @ts-ignore
-                            return dateB - dateA
-                          })
-                          .map((item) => {
-                            return (
-                              <div
-                                key={item._id}
-                                className="border-b border-gray-200 py-6 text-base last:border-b-0 last:pb-0 dark:border-gray-700 dark:bg-gray-900">
-                                <div className="mb-2 flex items-center justify-between">
-                                  <div className="flex items-center">
-                                    <p className="mr-3 inline-flex items-center space-x-2 text-sm font-semibold text-gray-900 dark:text-white">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1}
-                                        stroke="currentColor"
-                                        className="h-6 w-6 text-gray-500">
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                      </svg>
-                                      <span>{item.user.name}</span>
-                                    </p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                      <time
-                                        dateTime="2022-06-23"
-                                        title="June 23rd, 2022">
-                                        {formatDate(item.createdAt)}
-                                      </time>
-                                    </p>
-                                  </div>
+                        .sort((a, b) => {
+                          const dateA = new Date(a.createdAt)
+                          const dateB = new Date(b.createdAt)
+                          // @ts-ignore
+                          return dateB - dateA
+                        })
+                        .map((item) => {
+                          return (
+                            <div
+                              key={item._id}
+                              className="border-b border-gray-200 py-6 text-base last:border-b-0 last:pb-0 dark:border-gray-700 dark:bg-gray-900">
+                              <div className="mb-2 flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <p className="mr-3 inline-flex items-center space-x-2 text-sm font-semibold text-gray-900 dark:text-white">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1}
+                                      stroke="currentColor"
+                                      className="h-6 w-6 text-gray-500">
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                                      />
+                                    </svg>
+                                    <span>{item.user.name}</span>
+                                  </p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    <time
+                                      dateTime="2022-06-23"
+                                      title="June 23rd, 2022">
+                                      {formatDate(item.createdAt)}
+                                    </time>
+                                  </p>
                                 </div>
-                                <p className="text-gray-500 dark:text-gray-400">{item.description}</p>
                               </div>
-                            )
-                          })}
+                              <p className="text-gray-500 dark:text-gray-400">{item.description}</p>
+                              <div className="border-gray-500 mt-5 border-2 rounded-lg p-5">
+                                <h4>Информация:</h4>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  ФИО: <span className="text-black">{item.user.lastname} {item.user.name} {item.user.surname}</span>
+                                </div>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  Дата рождения: <span className="text-black">{item.user.dateBirth}</span>
+                                </div>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  Должность: <span className="text-black">{item.user.speciality}</span>
+                                </div>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  Город: <span className="text-black">{item.user.city}</span>
+                                </div>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  Телефон: <span className="text-black">{item.user.phoneNumber}</span>
+                                </div>
+                                <div className="text-gray-500 mt-2 dark:text-gray-400">
+                                  Документы: {item.user.documents.map(item => {
+                                    return (
+                                      <>
+                                        <Link target="_blank" href={item.link} className="text-blue-500">{item.name + " "}</Link>
+                                      </>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
                   </div>
                 </div>
               </div>
